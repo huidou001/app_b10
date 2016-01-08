@@ -1886,7 +1886,6 @@ void YS_RunAppWorkFlowManage(void)
     switch(t_SysRunStatus.RunFlow)
     {
         case YS_RUN_FLOW_INIT: 			//系统初始化
-//            YS_FileTest();
             ycsj_debug("YS_RUN_FLOW_INIT1");
             sjfun_Begin_RsqNetInfo();
             t_FlowInfo.OptDelay=0;
