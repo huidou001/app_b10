@@ -144,4 +144,10 @@ extern void sjfun_Aux_Com_send(U8 *dbuf, U16 dlen);
 extern u8 sjfun_SkyLine_Mode(void);
 
 extern void sjfun_Debug_Agps_Write(U8 *dbuf, U16 dlen);
+
+extern void sjfun_VmcSignControl(u8 id);
+
+extern u8 sjfun_VmcGetOCStatus(void);
+
+extern void sjfun_ucs2totext_str(u8 *dst, u32 size, u8 *src, u8 num);
 #endif

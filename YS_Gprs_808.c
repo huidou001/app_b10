@@ -181,7 +181,7 @@ u16 YS_GprsSendAckPackage(u8 *PackBuf, u8 *AddInfo, u8 rlt)
 -------------------------------------------------------------------------------------------*/
 u16 YS_GprsPackRegPackage(u8 *PackBuf)
 {
-    u8 tempbuf[200],fbuf[20];
+    u8 tempbuf[200],fbuf[20],len;
     u16 i,pos,PackLen;
 
     pos=0;
@@ -223,17 +223,23 @@ u16 YS_GprsPackRegPackage(u8 *PackBuf)
         pos++;
     }
 
-    YS_PrmReadOneItem(FLH_JTB_PLATE_COLOR,FLH_JTB_PLATE_COLOR_LEN,fbuf);  //车牌颜色
-    tempbuf[pos]=fbuf[0];
+//    YS_PrmReadOneItem(FLH_JTB_PLATE_COLOR,FLH_JTB_PLATE_COLOR_LEN,fbuf);  //车牌颜色
+//    tempbuf[pos]=fbuf[0];
+    tempbuf[pos]=0x01;
     pos++;
 
     YS_PrmReadOneItem(FLH_JTB_PLATE_STRING,FLH_JTB_PLATE_STRING_LEN,fbuf);  //车牌号码
-    for(i=0; i<7; i++)
+//    for(i=0; i<7; i++)
+//    {
+//        tempbuf[pos]=fbuf[i];
+//        pos++;
+//    }
+    len=YS_CodeBufRealLen(fbuf,FLH_JTB_PLATE_STRING_LEN);
+    for(i=0; i<len; i++)
     {
         tempbuf[pos]=fbuf[i];
         pos++;
     }
-
     PackLen=YS_GprsDealJTBPtlSend(0x0100,tempbuf,pos,PackBuf,1,1);
     return(PackLen);
 }
@@ -1722,6 +1728,11 @@ bool YS_GprsJBTSckPtlUpConver(void)
                     if (t_AvlSckConver.a_dbuf[0]==0)
                     {
                         YS_RunLoginServerAck();
+                    }
+                    else
+                    {
+                        fbuf[0]=FJYD_TERI_STATUS_INIT;
+                        YS_PrmWriteOneItem(FLH_PRM_ACTIVE_FLAG, FLH_PRM_ACTIVE_FLAG_LEN, fbuf);
                     }
                     break;
 

@@ -41,7 +41,7 @@
 
 #define	IP_CHANGE_EN     		1
 
-#define 	EBIKE_SOFT_VER  			"B10_V1.3"
+#define 	EBIKE_SOFT_VER  			"B10_V1.3t"
 
 #define   PROJECT_NAME_DEF			"OBD"
 

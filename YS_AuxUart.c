@@ -73,7 +73,7 @@ bool YS_OBDParaseCarRun(u8 *buf, u16 len)
                 if(count>=19)
                 {
                     loop-=i;
-                    pos +=i;;
+                    pos +=i;
                     return;
                 }
             }

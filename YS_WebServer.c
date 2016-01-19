@@ -840,7 +840,11 @@ void YS_WebFirstPackRsqParase(u8 *buf, u16 len)
 
     GetLen=YS_CodeGetItemInBuf(&buf[pos],len-pos,StrDat,0,' ',20);
     StrDat[GetLen]=0;
-
+    if (GetLen <=3)
+    {
+        t_WebManage.RsqOKFlag=1;
+        return;
+    }
     ycsj_debug("THE VER IS:");
     ycsj_debug((char *)StrDat);
     if (YS_WebJudgeUpdate(StrDat, GetLen) == TRUE)

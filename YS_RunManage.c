@@ -1174,7 +1174,6 @@ void YS_RunIdleCANCtrl(void)
 //            YS_GprsServerSendInterface(SERV_UP_CMD_FAULT, NULL,0);
 //        }
     }
-
 }
 
 /*-----------------------------------------------------------------------------------------
@@ -1590,8 +1589,6 @@ void YS_RunLoginServerInit(void)
     t_FlowInfo.LogDelay=RUN_LOGIN_DELAY_DEF;
 }
 
-
-
 /*-----------------------------------------------------------------------------------------
 函数名：YS_RunLoginServerAck
 功能说明：登录平台应答
@@ -1858,8 +1855,8 @@ void YS_RunUpdateRequest(void)
     {
         t_FlowInfo.BankAccStatus = FALSE;
     }
-
 }
+
 /*-----------------------------------------------------------------------------------------
 函数名：YS_RunAppWorkFlowManage
 功能说明：系统工作时序管理
@@ -1901,7 +1898,6 @@ void YS_RunAppWorkFlowManage(void)
                 t_SysRunStatus.RunFlow=YS_RUN_FLOW_RST_EXITWAIT;
 //                t_SysRunStatus.RunFlow=YS_RUN_FLOW_WAIT_PPP;
             }
-
 #else
             if(t_SysRunStatus.RegStatus==1)
             {
@@ -2076,8 +2072,8 @@ void YS_RunAppWorkFlowManage(void)
             {
                 t_FlowInfo.SocOk = 1;
                 t_FlowInfo.SocketErrTimes=0;
-                t_SysRunStatus.RunFlow=YS_RUN_FLOW_SEVLOG_BEGIN;
-//                t_SysRunStatus.RunFlow=YS_RUN_FLOW_REGSERVER_BEGIN;
+//                t_SysRunStatus.RunFlow=YS_RUN_FLOW_SEVLOG_BEGIN;
+                t_SysRunStatus.RunFlow=YS_RUN_FLOW_REGSERVER_BEGIN;
             }
             else
             {

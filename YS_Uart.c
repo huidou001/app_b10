@@ -24,6 +24,7 @@
 #define UART_CMD_HEAD_VERCHK        "#VER#?#"
 #define UART_CMD_HEAD_OBD           "#OBD#"
 #define UART_CMD_HEAD_ID            "#ID#"
+#define UART_CMD_HEAD_PTE           "#PTE#"
 
 enum
 {
@@ -42,6 +43,7 @@ enum
     UART_ACK_IMEICHK,
     UART_ACK_VERCHK,
     UART_ACK_ID_OK,
+    UART_ACK_PTE_OK,
 };
 
 t_avltra_Parase 	t_AvlComParase;
@@ -1279,6 +1281,28 @@ void YS_UartCmdAckDeal(u8 RltID)
             pos ++;
             break;
 
+        case UART_ACK_PTE_OK:
+            uart_buf[pos]='#';
+            pos ++;
+            uart_buf[pos]='P';
+            pos ++;
+            uart_buf[pos]='T';
+            pos ++;
+            uart_buf[pos]='E';
+            pos ++;
+            uart_buf[pos]='#';
+            pos ++;
+            YS_PrmReadOneItem(FLH_JTB_PLATE_STRING,FLH_JTB_PLATE_STRING_LEN,fbuf);
+            len = strlen((char *)fbuf);
+            for(i=0; i<len; i++)
+            {
+                uart_buf[pos]=fbuf[i];
+                pos++;
+            }
+            uart_buf[pos]='#';
+            pos ++;
+            break;
+
         default:
             break;
     }
@@ -1507,15 +1531,18 @@ bool YS_UartInputCmdControl(u8 *dbuf, u8 dlen)
         else if ('0'==StrDat[0])
         {
             //关闭GPS 电源
-            sjfun_Gpio_Write_Value(YS_PIN_NO_GPS_PWR,0);
+            sjfun_VmcSignControl(0);
+//            sjfun_Gpio_Write_Value(YS_PIN_NO_GPS_PWR,0);
             YS_RunSetGpsPower(0);
             YS_UartCmdAckDeal(UART_ACK_GPS_OK);
         }
         else
         {
             //打开GPS 电源
-            sjfun_Gpio_Write_Value(YS_PIN_NO_GPS_PWR,1);
+            sjfun_VmcSignControl(1);
+//            sjfun_Gpio_Write_Value(YS_PIN_NO_GPS_PWR,1);
             YS_RunSetGpsPower(1);
+
             YS_UartCmdAckDeal(UART_ACK_GPS_OK);
         }
 
@@ -1574,6 +1601,20 @@ bool YS_UartInputCmdControl(u8 *dbuf, u8 dlen)
         {
             YS_PrmWriteOneItem(FLH_PRM_SIM_CODE,FLH_PRM_SIM_CODE_LEN, StrDat);
             YS_UartCmdAckDeal(UART_ACK_ID_OK);
+        }
+    }
+    else if (YS_UartCompHeadDeal(UART_CMD_HEAD_PTE,dbuf,dlen)==TRUE)
+    {
+        GetLen=YS_CodeGetItemInBuf(dbuf,dlen,StrDat,2,'#',20);
+        StrDat[GetLen]=0;
+        if ('?'==StrDat[0])
+        {
+            YS_UartCmdAckDeal(UART_ACK_PTE_OK);
+        }
+        else
+        {
+            YS_PrmWriteOneItem(FLH_JTB_PLATE_STRING,FLH_JTB_PLATE_STRING_LEN, StrDat);
+            YS_UartCmdAckDeal(UART_ACK_PTE_OK);
         }
     }
     return FALSE;

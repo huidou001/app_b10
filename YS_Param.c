@@ -319,8 +319,8 @@ void YS_PrmSetFactroyWorkParam(void)
     fbuf[len]=0;
     YS_PrmWriteOneItem(FLH_PRM_PASSWORD,FLH_PRM_PASSWORD_LEN,fbuf);
 
-    sprintf(StrDat,"dev.comobot.com");		//服务器IP
-
+//    sprintf(StrDat,"dev.comobot.com");		//服务器IP
+    sprintf(StrDat,"219.234.95.56");		//服务器IP
 
     len=strlen(StrDat);
     for(i=0; i<len; i++)
@@ -329,8 +329,8 @@ void YS_PrmSetFactroyWorkParam(void)
     }
     fbuf[len]=0;
     YS_PrmWriteOneItem(FLH_PRM_SERV_ADDR,FLH_PRM_SERV_ADDR_LEN,fbuf);
-    fbuf[0]=0x27;								//服务器端口6612
-    fbuf[1]=0x6b;
+    fbuf[0]=0x17;								//服务器端口6000
+    fbuf[1]=0x70;
     YS_PrmWriteOneItem(FLH_PRM_SERV_PORT,FLH_PRM_SERV_PORT_LEN,fbuf);
 
     sprintf(StrDat,"cmnet");					//APN信息
@@ -569,6 +569,18 @@ void YS_PrmSetFactroyWorkParam(void)
     fbuf[0]=0x00;								//CAN包周期30秒
     fbuf[1]=0x0a;
     YS_PrmWriteOneItem(FLH_PRM_CAN_TIME,FLH_PRM_CAN_TIME_LEN,fbuf);
+
+    fbuf[0] = 0xd4;
+    fbuf[1] = 0xc1;
+    fbuf[2] = 0x47;
+    fbuf[3] = 0x31;
+    fbuf[4] = 0x32;
+    fbuf[5] = 0x33;
+    fbuf[6] = 0x34;
+    fbuf[7] = 0x36;
+    fbuf[8] = 0;
+    YS_PrmWriteOneItem(FLH_JTB_PLATE_STRING,FLH_JTB_PLATE_STRING_LEN,fbuf);
+
 }
 
 /*-----------------------------------------------------------------------------------------

@@ -1032,3 +1032,41 @@ u32 sjfun_get_unix_time(void)
 	   return p_sjfun_get_unix_time();
 	return NULL;
 }
+
+//控制VMC
+typedef void (*p_sjfun_VmcSignControl_t)(u8 id);
+p_sjfun_VmcSignControl_t  p_sjfun_VmcSignControl = NULL;
+void sjfun_VmcSignControl(u8 id)
+{
+	if(NULL == p_sjfun_VmcSignControl)
+		p_sjfun_VmcSignControl = (p_sjfun_VmcSignControl_t)jt_get_sym_entry("VmcSignControl");
+
+	if(NULL != p_sjfun_VmcSignControl)
+	   p_sjfun_VmcSignControl(id);
+}
+
+//获取VMC状态
+typedef u8 (*p_sjfun_VmcGetOCStatus_t)(void);
+p_sjfun_VmcGetOCStatus_t  p_sjfun_VmcGetOCStatus = NULL;
+u8 sjfun_VmcGetOCStatus(void)
+{
+	if(NULL == p_sjfun_VmcGetOCStatus)
+		p_sjfun_VmcGetOCStatus = (p_sjfun_VmcGetOCStatus_t)jt_get_sym_entry("VmcGetOCStatus");
+
+	if(NULL != p_sjfun_VmcGetOCStatus)
+	   return p_sjfun_VmcGetOCStatus();
+	return NULL;
+
+}
+
+//unicode 转 GB23212
+typedef void (*p_sjfun_ucs2totext_str_t)(u8 *dst, u32 size, u8 *src, u8 num);
+p_sjfun_ucs2totext_str_t  p_sjfun_ucs2totext_str = NULL;
+void sjfun_ucs2totext_str(u8 *dst, u32 size, u8 *src, u8 num)
+{
+	if(NULL == p_sjfun_ucs2totext_str)
+		p_sjfun_ucs2totext_str = (p_sjfun_ucs2totext_str_t)jt_get_sym_entry("ucs2totext_str");
+
+	if(NULL != p_sjfun_ucs2totext_str)
+	   p_sjfun_ucs2totext_str(dst, size, src, num);
+}
