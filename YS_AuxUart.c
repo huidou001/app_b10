@@ -13,6 +13,7 @@ t_AuxUart_Parsae_Buf	t_AuxParaseBuf;
 t_Obd_Fault_Info        t_ObdFaultInfo;
 t_Obd_Main_Info         t_ObdMainInfo;
 
+u8 OBDRstFlag=FALSE;
 /*-----------------------------------------------------------------------------------------
 函数名：YS_GpsGetPosData
 功能说明：获取一个GPS 数据结构的拷贝
@@ -130,11 +131,11 @@ void YS_OBDOneLinesDeal(u8 *dbuf, u16 dlen)
 {
     if (YS_OBDParaseCarRun(dbuf, dlen) == TRUE)
     {
-        ycsj_debug("car run Parase ok!");
+//        ycsj_debug("car run Parase ok!");
     }
     else
     {
-        ycsj_debug("car Parase fail!");
+//        ycsj_debug("car Parase fail!");
     }
 }
 
@@ -227,6 +228,25 @@ void YS_AuxUartSendCmd(void)
 
 }
 
+void YS_OBDRstInit(bool flag)
+{
+    OBDRstFlag = flag;
+}
+
+void YS_OBDRstDeal(void)
+{
+    static u8 num = 0;
+    if (OBDRstFlag == TRUE)
+    {
+        sjfun_Gpio_Write_Value(YS_PIN_NO_OBD_RST,0);
+        num ++;
+        if (num >=2)
+        {
+            OBDRstFlag = FALSE;
+            sjfun_Gpio_Write_Value(YS_PIN_NO_OBD_RST,1);
+        }
+    }
+}
 /*-----------------------------------------------------------------------------------------
 函数名：YS_AuxUartDealInit
 功能说明：初始化数据接收
@@ -236,7 +256,7 @@ void YS_AuxUartBufInit(void)
 {
     t_AuxParaseBuf.AddEnable=1;
     t_AuxParaseBuf.DataLen=0;
-
+    YS_OBDRstInit(TRUE);
     sjfun_Open_AuxUart();
 }
 
@@ -267,7 +287,6 @@ void YS_AuxBufParaseDeal(void)
 void YS_AuxBufAddData(u8 *dbuf, u16 dlen)
 {
     u16 i;
-
     if((t_AuxParaseBuf.DataLen+dlen)<=YS_GPS_BUF_LEN) //如果缓冲区可存贮
     {
         for(i=0; i<dlen; i++)

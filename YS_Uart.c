@@ -1084,6 +1084,7 @@ void YS_UartCmdAckDeal(u8 RltID)
             break;
 
         case UART_ACK_IP_CHK:
+            YS_OBDRstInit(TRUE);
             len = strlen((char *)ip);
             for ( i = 0; i<len; i++ )
             {

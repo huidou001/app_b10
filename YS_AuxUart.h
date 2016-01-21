@@ -53,4 +53,8 @@ extern void YS_OBDGetMainInfo(t_Obd_Main_Info *pt_GetObdMain);
 extern void YS_ObdGetCarData(t_Obd_Main_Info *pt_ObdMainInfo);
 
 extern u16  YS_ObdCarPackage(u8 *PackBuf);
+
+extern void YS_OBDRstInit(bool flag);
+
+extern void YS_OBDRstDeal(void);
 #endif

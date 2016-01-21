@@ -10,8 +10,8 @@
 #define Web_Exit_Wait_Delay		5
 
 #if 1   //dog care
-#define WEBSTR_RSQ    "POST http://qq.dogcare.com.cn/zhf/TEST/B10.bin HTTP/1.1"
-#define WEBSTR_UPDATE "POST http://qq.dogcare.com.cn/zhf/TEST/jt_ads.bin HTTP/1.1"
+#define WEBSTR_RSQ    "POST http://qq.dogcare.com.cn/zhf/TEST_B10/B10.bin HTTP/1.1"
+#define WEBSTR_UPDATE "POST http://qq.dogcare.com.cn/zhf/TEST_B10/jt_ads.bin HTTP/1.1"
 
 #define WEBSTR_1 "Host:http://www.dogcare.com.cn"
 #define WEBSTR_2 "User-Agent:SQH_D480B_01/LB19504/WAP2.0Profile"

@@ -79,13 +79,13 @@ void YS_IODealLedTimerHandler(void)
 -------------------------------------------------------------------------------------------*/
 void YS_IODealInit(void)
 {
-    sjfun_Gpio_Set_Mode(YS_PIN_NO_LED_GPS, 0);
-    sjfun_Gpio_Set_Direction(YS_PIN_NO_LED_GPS,0);
-    sjfun_Gpio_Write_Value(YS_PIN_NO_LED_GPS,0);
+//    sjfun_Gpio_Set_Mode(YS_PIN_NO_LED_GPS, 0);
+//    sjfun_Gpio_Set_Direction(YS_PIN_NO_LED_GPS,0);
+//    sjfun_Gpio_Write_Value(YS_PIN_NO_LED_GPS,0);
 
-    sjfun_Gpio_Set_Mode(YS_PIN_NO_LED_GSM, 0);
-    sjfun_Gpio_Set_Direction(YS_PIN_NO_LED_GSM,0);
-    sjfun_Gpio_Write_Value(YS_PIN_NO_LED_GSM,0);
+//    sjfun_Gpio_Set_Mode(YS_PIN_NO_LED_GSM, 0);
+//    sjfun_Gpio_Set_Direction(YS_PIN_NO_LED_GSM,0);
+//    sjfun_Gpio_Write_Value(YS_PIN_NO_LED_GSM,0);
 
     sjfun_Gpio_Set_Mode(YS_PIN_NO_GPS_PWR, 0);
     sjfun_Gpio_Set_Direction(YS_PIN_NO_GPS_PWR,0);
@@ -96,6 +96,11 @@ void YS_IODealInit(void)
     sjfun_Gpio_Set_PullValue(YS_PIN_NO_ACC_PWR,1);
     sjfun_Gpio_Set_Direction(YS_PIN_NO_ACC_PWR,1);
     sjfun_Gpio_Write_Value(YS_PIN_NO_ACC_PWR,1);
+
+
+    sjfun_Gpio_Set_Mode(YS_PIN_NO_OBD_RST, 0);
+    sjfun_Gpio_Set_Direction(YS_PIN_NO_OBD_RST,0);
+    sjfun_Gpio_Write_Value(YS_PIN_NO_OBD_RST,1);
 
     t_GpioCtrlManage.GpsLedStatus=0;
     t_GpioCtrlManage.GsmLedStatus=0;

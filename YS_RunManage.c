@@ -1139,7 +1139,7 @@ void YS_RunIdlePosCtrl(void)
         PosDelaySet=PosDelaySet*6;
     }
     t_FlowInfo.PosDelay++;
-    if(t_FlowInfo.PosDelay >= 30)
+    if(t_FlowInfo.PosDelay >= 5)
     {
         t_FlowInfo.PosDelay=0;
         YS_GprsServerSendInterface(SERV_UP_CMD_POS, NULL,0);
@@ -1871,6 +1871,7 @@ void YS_RunAppWorkFlowManage(void)
     u8 DnsRlt;
 
     YS_IOInputInfoDeal();
+    YS_OBDRstDeal();
     YS_WebServiceRsqFlow();
     YS_RunAutoRstCtrl(); 			//定时复位管理
 //    YS_AGpsGetRunFlow();

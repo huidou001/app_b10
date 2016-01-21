@@ -306,7 +306,14 @@ void YS_PrmSetFactroyWorkParam(void)
     fbuf[len]=0;
     YS_PrmWriteOneItem(FLH_PRM_TERI_IMEI,FLH_PRM_TERI_IMEI_LEN,fbuf);
 
-    memset(fbuf,0,FLH_PRM_SIM_CODE_LEN);
+//    memset(fbuf,0,FLH_PRM_SIM_CODE_LEN);
+    sprintf(StrDat,"13537789602");		//终端IMEI
+    len=strlen(StrDat);
+    for(i=0; i<len; i++)
+    {
+        fbuf[i]=StrDat[i];
+    }
+    fbuf[len]=0;
     YS_PrmWriteOneItem(FLH_PRM_SIM_CODE,FLH_PRM_SIM_CODE_LEN,fbuf); 			//初始化SIM卡号为空
     YS_PrmWriteOneItem(FLH_PRM_OWNER_CODE,FLH_PRM_OWNER_CODE_LEN,fbuf);		//初始化车主号码为空
 
