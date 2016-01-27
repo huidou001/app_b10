@@ -28,7 +28,6 @@ t_Net_Info 			t_NetInfo;
 -------------------------------------------------------------------------------------------*/
 void YS_FactoryMode(void)
 {
-//#if UART_DBG_EN == 0
     char DispBuf[200];
     char fbuf[100],StrDat[20];
     u16 i,len,pos,dat16;
@@ -208,12 +207,25 @@ void YS_FactoryMode(void)
     pos++;
     DispBuf[pos]='\0';
     pos++;
-//    sprintf(DispBuf,"\n%s:%d",DebugStr,Value);
-//    U_PutUARTBytes(0,(kal_uint8 *)DispBuf,strlen(DispBuf));
-    ycsj_debug((char *)(DispBuf));
+    if (t_FlowInfo.DebugLog == TRUE)
+    {
+        ycsj_debug((char *)(DispBuf));
+    }
+
 //#endif
 }
 
+void SetDebugLog(void)
+{
+    if (t_FlowInfo.DebugLog == FALSE)
+    {
+        t_FlowInfo.DebugLog = TRUE;
+    }
+    else
+    {
+        t_FlowInfo.DebugLog = FALSE;
+    }
+}
 /*-----------------------------------------------------------------------------------------
 函数名：YS_RunCleanWarmFlag
 功能说明：清除报警标志
@@ -962,6 +974,7 @@ void YS_RunInitSysInfo(void)
     {
         t_SysRunStatus.WarnStatus[i]=0;
     }
+    t_FlowInfo.DebugLog = TRUE;
 }
 
 /*-----------------------------------------------------------------------------------------
@@ -2188,7 +2201,7 @@ void YS_RunAppWorkFlowManage(void)
 //            YS_RunTraceCtrl();			//上报TRACE 数据
             YS_RunIdlePosCtrl();	//定时数据上报控制
             YS_RunIdleCANCtrl();
-            if(t_FlowInfo.HeartTimes>RUN_HEART_TIMES_DEF)
+            if(t_FlowInfo.HeartTimes>=RUN_HEART_TIMES_DEF)
             {
                 sjfun_Socket_Close(t_FlowInfo.SocketID);
                 t_SysRunStatus.RunFlow=YS_RUN_FLOW_RDCON_BEGIN;
@@ -2417,7 +2430,7 @@ void YS_RunYSAppEntry(void)
     YS_IOVibJudgeInit();
 //    YS_DWAppInitDeal();
     YS_SmsManageInit();
-    YS_GSensorInitDeal();
+//    YS_GSensorInitDeal();
     YS_AuxUartBufInit();
     SysInfoInitOk=TRUE;
 }

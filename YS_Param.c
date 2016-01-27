@@ -307,7 +307,7 @@ void YS_PrmSetFactroyWorkParam(void)
     YS_PrmWriteOneItem(FLH_PRM_TERI_IMEI,FLH_PRM_TERI_IMEI_LEN,fbuf);
 
 //    memset(fbuf,0,FLH_PRM_SIM_CODE_LEN);
-    sprintf(StrDat,"13537789602");		//÷’∂ÀIMEI
+    sprintf(StrDat,"1353789600");		//÷’∂ÀIMEI
     len=strlen(StrDat);
     for(i=0; i<len; i++)
     {
@@ -580,11 +580,11 @@ void YS_PrmSetFactroyWorkParam(void)
     fbuf[0] = 0xd4;
     fbuf[1] = 0xc1;
     fbuf[2] = 0x47;
-    fbuf[3] = 0x31;
-    fbuf[4] = 0x32;
-    fbuf[5] = 0x33;
-    fbuf[6] = 0x34;
-    fbuf[7] = 0x36;
+    fbuf[3] = 0x38;
+    fbuf[4] = 0x39;
+    fbuf[5] = 0x36;
+    fbuf[6] = 0x30;
+    fbuf[7] = 0x30;
     fbuf[8] = 0;
     YS_PrmWriteOneItem(FLH_JTB_PLATE_STRING,FLH_JTB_PLATE_STRING_LEN,fbuf);
 

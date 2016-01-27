@@ -463,7 +463,7 @@ bool YS_GprsSendDataToServer(u8 *dbuf, u16 dlen)
 bool YS_GprsServerSendInterface(u8 CmdID, u8 *dbuf, u16 dlen)
 {
     bool 	rlt=FALSE;
-    u8		PackBuf[300];
+    u8		PackBuf[500];
     u16 		PackLen;
 
     PackLen=0;
@@ -550,9 +550,14 @@ bool YS_GprsServerSendInterface(u8 CmdID, u8 *dbuf, u16 dlen)
             PackLen = YS_GprsPackCarCtlAckPackage(PackBuf,dbuf);
             break;
 
+        case SERV_UP_CMD_OBDINFO:
+            PackLen = YS_GprsPackObdInfoAckPackage(PackBuf,dbuf,dlen);
+            break;
+
         case SERV_UP_CMD_ACK:
             PackLen=YS_GprsSendAckPackage(PackBuf,dbuf,dbuf[dlen-1]);
             break;
+
         default:
             break;
     }

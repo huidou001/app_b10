@@ -27,17 +27,20 @@ typedef  struct
 		u8   Toh;//节气门开度 %
 		u8	 Load;//发动机负荷 %
 		u8   Ect; //冷却液温度 C
-		u8   Fli;//剩余油量 %
-        u8   XM; //百公里油耗
-		u8   XH;//怠速油耗
+		u16   Fli;//剩余油量 %
+        u32   XM; //百公里油耗
+		u32   XH;//怠速油耗
         u8   Ga;//急加速次数
         u8   Gb;//急刹车次数
 
         u8	 FaultNum; //故障码个数
 		u32	 Ms;//上电累计里程 Km
 		u32  Fs;//累计耗油量
-		u8   Ts;//点火时间H
+		u32   Ts;//点火时间H
         u8   Ss;//点火次数
+        u8   Gx;//x轴加速度
+        u8   Gy;//Y轴加速度
+        u8   Gz;//z轴加速度
         u16  ObdStrlen;
         u8   ObdStr[200]; //字符数据
 }t_Obd_Main_Info;

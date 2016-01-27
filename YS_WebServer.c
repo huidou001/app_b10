@@ -895,7 +895,7 @@ u32 YS_WebFirstPackDataParase(u8 *buf, u16 len)
 功能说明：Web  平台应答数据解析处理
 修改记录：
 -------------------------------------------------------------------------------------------*/
-void	YS_WebServiceDataParase(u8 *buf, u16 len)
+void  YS_WebServiceDataParase(u8 *buf, u16 len)
 {
     u32 writed=0;
     int res;

@@ -216,6 +216,7 @@ typedef struct
 	bool 	RegOKFlag;
 
 	u8		ServRegErrTimes;
+	u8      DebugLog;
 }t_Flow_Info;
 
 typedef struct
@@ -487,5 +488,7 @@ extern void YS_RunMotorCtrlInterface(void);
 extern void YS_MotorIOCtrl(bool lever);
 
 extern void YS_RunSetFlowRst(void);
+
+extern void SetDebugLog(void);
 #endif
 

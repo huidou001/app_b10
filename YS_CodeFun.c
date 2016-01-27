@@ -226,6 +226,10 @@ void YS_CodeHextoString(u8 *buf,u16 len, u8 *p)
 		pos++;
 
 	}
+	p[pos] = '\r';
+	pos++;
+	p[pos] = '\n';
+	pos++;
 	p[pos] = 0;
 }
 

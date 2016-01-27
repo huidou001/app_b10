@@ -216,10 +216,10 @@ u16 YS_GprsPackRegPackage(u8 *PackBuf)
         pos++;
     }
 
-    YS_PrmReadOneItem(FLH_JTB_TERMINAM_ID,FLH_JTB_TERMINAM_ID_LEN,fbuf);  //终端型号
+//    YS_PrmReadOneItem(FLH_JTB_TERMINAM_ID,FLH_JTB_TERMINAM_ID_LEN,fbuf);  //终端ID
     for(i=0; i<7; i++)
     {
-        tempbuf[pos]=fbuf[i];
+        tempbuf[pos]=0x31;
         pos++;
     }
 
@@ -229,11 +229,6 @@ u16 YS_GprsPackRegPackage(u8 *PackBuf)
     pos++;
 
     YS_PrmReadOneItem(FLH_JTB_PLATE_STRING,FLH_JTB_PLATE_STRING_LEN,fbuf);  //车牌号码
-//    for(i=0; i<7; i++)
-//    {
-//        tempbuf[pos]=fbuf[i];
-//        pos++;
-//    }
     len=YS_CodeBufRealLen(fbuf,FLH_JTB_PLATE_STRING_LEN);
     for(i=0; i<len; i++)
     {
@@ -433,28 +428,11 @@ u16 YS_GprsPackPrmAckPackage(u8 *PackBuf, u8 *AddInfo)
 功能说明：封装Gps信息
 修改记录：
 -------------------------------------------------------------------------------------------*/
-u16 YS_GprsPackObdInfo(u8 *GpsBuf)
-{
-    u16 pos,i,len,count;
-
-    pos = 0;
-    //附加信息报警数据包
-    GpsBuf[pos]=0xe1;
-    pos++;
-
-
-    return(pos);
-}
-
-/*-----------------------------------------------------------------------------------------
-函数名：YS_GprsPackGpsInfo
-功能说明：封装Gps信息
-修改记录：
--------------------------------------------------------------------------------------------*/
 u16 YS_GprsPackGpsInfo(u8 *GpsBuf)
 {
     t_Sys_Run_Status	t_GetStatus;
     t_Gps_Data_Info	t_GetGps;
+    t_Obd_Main_Info t_GetObd;
     Avl_ULong  ldat;
     u32 ValueTmp=0;
     u16 pos,i,len;
@@ -464,6 +442,7 @@ u16 YS_GprsPackGpsInfo(u8 *GpsBuf)
     pos=0;
     YS_RunGetSystemStatus(&t_GetStatus);
     YS_GpsGetPosData(&t_GetGps);
+    YS_OBDGetMainInfo(&t_GetObd);
 
     /*------------------------报警状态字封装------------------------*/
     ldat.l=0;
@@ -576,7 +555,7 @@ u16 YS_GprsPackGpsInfo(u8 *GpsBuf)
         ldat.l|=0x00000001;
     }
 
-//    if(t_GetGps.Effective) //设置GPS 定位标志
+    if(t_GetGps.Effective) //设置GPS 定位标志
     {
         ldat.l|=0x00000002;
     }
@@ -692,9 +671,9 @@ u16 YS_GprsPackGpsInfo(u8 *GpsBuf)
     pos++;
     GpsBuf[pos]=0x02;
     pos++;
-    GpsBuf[pos]=0x01;
+    GpsBuf[pos]=t_GetObd.Fli/256;
     pos++;
-    GpsBuf[pos]=0x01;
+    GpsBuf[pos]=t_GetObd.Fli%256;
     pos++;
 
     //附加信息三记录仪速度
@@ -739,6 +718,59 @@ u16 YS_GprsPackGpsInfo(u8 *GpsBuf)
         GpsBuf[pos]=fbuf[1];//进、出区域
         pos++;
     }
+
+    //Obd 数据
+    GpsBuf[pos]=0xE3;
+    pos++;
+    GpsBuf[pos]=0x18;
+    pos++;
+    //电压
+    GpsBuf[pos]=t_GetObd.Vmp;
+    pos++;
+    //转速
+    GpsBuf[pos]=t_GetObd.Rpm/256;
+    pos++;
+    GpsBuf[pos]=t_GetObd.Rpm%256;
+    pos++;
+    //车速
+    GpsBuf[pos]=t_GetObd.Spd;
+    pos++;
+    //节气门开度
+    GpsBuf[pos]=t_GetObd.Toh;
+    pos++;
+    //发动机负荷
+    GpsBuf[pos]=t_GetObd.Load;
+    pos++;
+    //冷却液温度
+    GpsBuf[pos]=t_GetObd.Ect;
+    pos++;
+    //本次累计油耗
+    GpsBuf[pos]=t_GetObd.Fs/256;
+    pos++;
+    GpsBuf[pos]=t_GetObd.Fs%256;
+    pos++;
+    //瞬时油耗
+    GpsBuf[pos]=t_GetObd.XM;
+    pos++;
+    //总里程
+    GpsBuf[pos]=0;
+    pos++;
+    GpsBuf[pos]=0;
+    pos++;
+    GpsBuf[pos]=0;
+    pos++;
+    GpsBuf[pos]=0;
+    pos++;
+    //本次里程
+    ldat.l = t_GetObd.Ms;
+    GpsBuf[pos]=ldat.b[AVL_LSTOR_FIR];
+    pos++;
+    GpsBuf[pos]=ldat.b[AVL_LSTOR_SEC];
+    pos++;
+    GpsBuf[pos]=ldat.b[AVL_LSTOR_THI];
+    pos++;
+    GpsBuf[pos]=ldat.b[AVL_LSTOR_FOR];
+    pos++;
 #if ENABLE_X1_MODLE == 4
     //多基站定位附加信息
     len = YS_SysPackNetInfo(&GpsBuf[pos]);
@@ -1690,6 +1722,216 @@ bool YS_GprsDealJTBServRecData(u8 *buf, u16 len)
     return(result);
 }
 
+/****************OBD 应答包*****************/
+/*-----------------------------------------------------------------------------------------
+函数名：YS_GprsPackObdInfoControl
+功能说明：读取OBD信息
+修改记录：
+-------------------------------------------------------------------------------------------*/
+u16 YS_GprsPackObdInfoControl(u8 *ObdBuf, u8 *AddInfo, u16 obdlen, u8 *obdPrm)
+{
+    u16 i,pos,PackLen;
+    u16 GpsLen;
+    t_Obd_Main_Info t_GetObd;
+
+    YS_GprsDebugString("\nServ Obd control",0);
+    YS_OBDGetMainInfo(&t_GetObd);
+
+    pos=0;
+    ObdBuf[pos]=AddInfo[10];
+    pos++;
+    ObdBuf[pos]=AddInfo[11];
+    pos++;
+
+    ObdBuf[pos]=obdlen;
+    pos++;
+
+    for ( i = 0; i < obdlen; i++ )
+    {
+        switch (obdPrm[i])
+        {
+            case 0x04 ://发动机负荷
+                ObdBuf[pos]=obdPrm[i]; //参数ID
+                pos++;
+                ObdBuf[pos]=0x01; //参数长度
+                pos++;
+                ObdBuf[pos]=t_GetObd.Load; //参数值
+                pos++;
+                break;
+
+            case 0x05 ://冷却液温度
+                ObdBuf[pos]=obdPrm[i]; //参数ID
+                pos++;
+                ObdBuf[pos]=0x01; //参数长度
+                pos++;
+                ObdBuf[pos]=t_GetObd.Ect+40; //参数值
+                pos++;
+                break;
+
+            case 0x0c ://发动机转速
+                ObdBuf[pos]=obdPrm[i]; //参数ID
+                pos++;
+                ObdBuf[pos]=0x02; //参数长度
+                pos++;
+                ObdBuf[pos]=t_GetObd.Rpm/256; //参数值
+                pos++;
+                ObdBuf[pos]=t_GetObd.Rpm%256; //参数值
+                pos++;
+                break;
+
+            case 0x0d ://车速
+                ObdBuf[pos]=obdPrm[i]; //参数ID
+                pos++;
+                ObdBuf[pos]=0x01; //参数长度
+                pos++;
+                ObdBuf[pos]=t_GetObd.Spd; //参数值
+                pos++;
+                break;
+
+            case 0x1f ://发动机启动后运行时间
+                ObdBuf[pos]=obdPrm[i]; //参数ID
+                pos++;
+                ObdBuf[pos]=0x02; //参数长度
+                pos++;
+                ObdBuf[pos]=t_GetObd.Ts/256; //参数值
+                pos++;
+                ObdBuf[pos]=t_GetObd.Ts%256; //参数值
+                pos++;
+                break;
+
+            case 0x42://电瓶电压
+                ObdBuf[pos]=obdPrm[i]; //参数ID
+                pos++;
+                ObdBuf[pos]=0x01; //参数长度
+                pos++;
+                ObdBuf[pos]=t_GetObd.Vmp; //参数值
+                pos++;
+                break;
+
+            case 0x06 :
+            case 0x07 :
+            case 0x08 :
+            case 0x09 :
+            case 0x0a :
+            case 0x0b :
+            case 0x0e :
+            case 0x0f :
+            case 0x11 :
+            case 0x12 :
+            case 0x13 :
+            case 0x1c :
+            case 0x1d :
+            case 0x1e :
+            case 0x2c :
+            case 0x2e :
+            case 0x2f :
+            case 0x30 :
+            case 0x33 :
+            case 0x44 :
+            case 0x45 :
+            case 0x46 :
+            case 0x47 :
+            case 0x48 :
+            case 0x49 :
+            case 0x4a :
+            case 0x4b :
+            case 0x4c :
+            case 0x51 :
+            case 0x52 :
+            case 0x5a :
+            case 0x5c :
+                ObdBuf[pos]=obdPrm[i]; //参数ID
+                pos++;
+                ObdBuf[pos]=0x01; //参数长度
+                pos++;
+                ObdBuf[pos]=0+100; //参数值
+                pos++;
+                break;
+
+            case 0x10 :
+            case 0x14 :
+            case 0x15 :
+            case 0x16 :
+            case 0x17 :
+            case 0x18 :
+            case 0x19 :
+            case 0x1a :
+            case 0x1b :
+            case 0x21 :
+            case 0x23 :
+            case 0x31 :
+            case 0x32 :
+            case 0x3c :
+            case 0x3d :
+            case 0x3e :
+            case 0x3f :
+            case 0x4d :
+            case 0x4e :
+            case 0x54 :
+            case 0x55 :
+            case 0x56 :
+            case 0x57 :
+            case 0x58 :
+            case 0x59 :
+                ObdBuf[pos]=obdPrm[i]; //参数ID
+                pos++;
+                ObdBuf[pos]=0x02; //参数长度
+                pos++;
+                ObdBuf[pos]=0; //参数值
+                pos++;
+                ObdBuf[pos]=0; //参数值
+                pos++;
+                break;
+
+            case 0x22 :
+            case 0x24 :
+            case 0x25 :
+            case 0x26 :
+            case 0x27 :
+            case 0x28 :
+            case 0x29 :
+            case 0x2a :
+            case 0x2b :
+            case 0x53 :
+            case 0x5d :
+            case 0x5e :
+                ObdBuf[pos]=obdPrm[i]; //参数ID
+                pos++;
+                ObdBuf[pos]=0x04; //参数长度
+                pos++;
+                ObdBuf[pos]=0; //参数值
+                pos++;
+                ObdBuf[pos]=0; //参数值
+                pos++;
+                ObdBuf[pos]=0; //参数值
+                pos++;
+                ObdBuf[pos]=0; //参数值
+                pos++;
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    return(pos);
+}
+
+/*-----------------------------------------------------------------------------------------
+函数名：YS_GprsPackObdInfoAckPackage
+功能说明：读取OBD信息
+修改记录：
+-------------------------------------------------------------------------------------------*/
+u16 YS_GprsPackObdInfoAckPackage(u8 *PackBuf, u8 *dbuf, u16 dlen)
+{
+    u16 PackLen;
+    YS_GprsDebugString("\nServ Obd ack",0);
+    PackLen=YS_GprsDealJTBPtlSend(0x0F03,dbuf,dlen,PackBuf,1,1);
+    return PackLen;
+}
+
+/*********************************/
+
 
 /*-----------------------------------------------------------------------------------------
 函数名：YS_GprsJBTSckPtlUpConver
@@ -1699,8 +1941,8 @@ bool YS_GprsDealJTBServRecData(u8 *buf, u16 len)
 bool YS_GprsJBTSckPtlUpConver(void)
 {
     bool result,ack;
-    u16 i,AckCmd;
-    u8 fbuf[5];
+    u16 i,AckCmd,len;
+    u8 fbuf[5],buf[500],DbgBuf[100];
 
     result=TRUE;
     memcpy(t_AvlSckConver.a_AddInfo,t_AvlSckParase.a_AddInfo,AVL_ADD_INFO_LEN);
@@ -1962,6 +2204,20 @@ bool YS_GprsJBTSckPtlUpConver(void)
                 YS_UartDebugInterfacel(INTER_PTL_UPDATE_DEBUGINFO, t_AvlSckConver.a_dbuf,t_AvlSckConver.v_dlen);
             }
             break;
+
+        case 0x8F03: //OBD读取指定数据流
+            YS_GprsDebugString("\nServ Obd chk",0);
+            for(i=0; i<t_AvlSckParase.v_dlen; i++)
+            {
+                t_AvlSckConver.a_dbuf[i]=t_AvlSckParase.a_dbuf[i];
+            }
+            t_AvlSckConver.v_dlen=t_AvlSckParase.v_dlen;
+
+            YS_CodeHextoString(t_AvlSckConver.a_dbuf, t_AvlSckConver.v_dlen, DbgBuf);
+            ycsj_debug((char *)DbgBuf);
+            len = YS_GprsPackObdInfoControl(buf, t_AvlSckConver.a_AddInfo, t_AvlSckParase.v_dlen, t_AvlSckConver.a_dbuf);
+            YS_GprsServerSendInterface(SERV_UP_CMD_OBDINFO, buf, len);
+            break;
 #if 0
         case 0x8300: //文本信息下发
             YS_GprsDebugString("\nGet center text down",0);
@@ -2146,4 +2402,3 @@ bool YS_GprsJBTSckPtlUpConver(void)
 
     return(result);
 }
-

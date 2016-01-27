@@ -160,6 +160,7 @@ unsigned char Simu_WriteI2C(unsigned char address ,unsigned char data)
 		return 6;
 	}
 	Stop_I2C();
+
 	return 0;
 }
 

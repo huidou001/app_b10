@@ -25,6 +25,7 @@
 #define UART_CMD_HEAD_OBD           "#OBD#"
 #define UART_CMD_HEAD_ID            "#ID#"
 #define UART_CMD_HEAD_PTE           "#PTE#"
+#define UART_CMD_HEAD_DBG           "#DEBUG#"
 
 enum
 {
@@ -1617,6 +1618,10 @@ bool YS_UartInputCmdControl(u8 *dbuf, u8 dlen)
             YS_PrmWriteOneItem(FLH_JTB_PLATE_STRING,FLH_JTB_PLATE_STRING_LEN, StrDat);
             YS_UartCmdAckDeal(UART_ACK_PTE_OK);
         }
+    }
+    else if(YS_UartCompHeadDeal(UART_CMD_HEAD_DBG,dbuf,dlen)==TRUE)
+    {
+        SetDebugLog();
     }
     return FALSE;
 }
