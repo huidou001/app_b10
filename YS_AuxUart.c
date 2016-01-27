@@ -78,7 +78,7 @@ bool YS_OBDParaseCarRun(u8 *buf, u16 len)
                     return FALSE;
                 }
             }
-#if 1
+#if 0
             tpos=pos;	//定位到第一个','
             count=0;
             for(i=tpos; i<len; i++)

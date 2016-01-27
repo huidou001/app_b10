@@ -467,7 +467,7 @@ bool YS_GprsServerSendInterface(u8 CmdID, u8 *dbuf, u16 dlen)
     u16 		PackLen;
 
     PackLen=0;
-#if 0
+#if 1
     switch(CmdID)
     {
         case SERV_UP_CMD_REG:	//×¢²á°ü
@@ -581,7 +581,7 @@ void YS_GprsGpsServerDataInput(u8 *dbuf, u16 dlen)
     ycsj_debug((char *)DbgBuf);
     while(dlen>0)
     {
-#if 0
+#if 1
         if(YS_GprsDealServRecData(dbuf,dlen)==TRUE)
         {
             YS_GprsSckPtlUpConver();

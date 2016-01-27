@@ -14,7 +14,7 @@
 #define YS_PIN_NO_LED_GPS		33
 #define YS_PIN_NO_LED_GSM		34
 
-#define YS_PIN_NO_GPS_PWR       55
+#define YS_PIN_NO_WAKEUP       54
 
 #define YS_PIN_NO_ACC_PWR       8
 
@@ -122,5 +122,7 @@ extern  void YS_SetPowoffKeyMsg(void);
 extern void YS_SetShutDownLedFlag(void);
 
 extern void YS_IOACCDydReCount(void);
+
+extern void YS_IODealLedTimerHandler(void);
 #endif
 

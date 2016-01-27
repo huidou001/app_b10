@@ -481,12 +481,12 @@ bool YS_GprsDealServRecData(u8 *buf, u16 len)
         count=0;
         for(i=0; i<len; i++)
         {
-            pos++;
             if((buf[i]==0x0D)&&((buf[i+1]==0x0A)))
             {
                 pos++;
                 break;
             }
+            pos++;
         }
 
         if(YS_GprsParaseHeadTail_obd(buf,pos)==TRUE)
@@ -522,9 +522,11 @@ bool YS_GprsSckPtlUpConver(void)
     result=TRUE;
     memcpy(t_AvlSckConver.a_AddInfo,t_AvlSckParase.a_AddInfo,AVL_ADD_INFO_LEN);
 
+    YS_RunIdleHeartAck();
     switch(t_AvlSckParase.v_CmdID)
     {
         case 0x01: //登入平台应答
+            YS_RunLoginServerAck();
             if (t_AvlSckParase.a_dbuf[1] == 0x31)
             {
                 YS_RunLoginServerAck();

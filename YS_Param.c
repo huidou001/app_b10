@@ -125,7 +125,7 @@ void YS_PamFormatRunParam(void)
     fbuf[1]=0xB4;
     YS_PrmWriteOneItem(FLH_PRM_ACC_TIME,FLH_PRM_ACC_TIME_LEN,fbuf); //ACCLT*/
 
-    fbuf[0]=0;
+    fbuf[0]=1;
     YS_PrmWriteOneItem(FLH_PRM_SLEEP_CTRL,FLH_PRM_SLEEP_CTRL_LEN,fbuf); //SLEEP ENABLE
     fbuf[0]=0x00;
     fbuf[1]=0x3c;
@@ -326,8 +326,8 @@ void YS_PrmSetFactroyWorkParam(void)
     fbuf[len]=0;
     YS_PrmWriteOneItem(FLH_PRM_PASSWORD,FLH_PRM_PASSWORD_LEN,fbuf);
 
-//    sprintf(StrDat,"dev.comobot.com");		//服务器IP
-    sprintf(StrDat,"219.234.95.56");		//服务器IP
+    sprintf(StrDat,"dev.comobot.com");		//服务器IP
+//    sprintf(StrDat,"219.234.95.56");		//服务器IP
 
     len=strlen(StrDat);
     for(i=0; i<len; i++)
@@ -336,8 +336,10 @@ void YS_PrmSetFactroyWorkParam(void)
     }
     fbuf[len]=0;
     YS_PrmWriteOneItem(FLH_PRM_SERV_ADDR,FLH_PRM_SERV_ADDR_LEN,fbuf);
-    fbuf[0]=0x17;								//服务器端口6000
-    fbuf[1]=0x70;
+//    fbuf[0]=0x17;								//服务器端口6000
+//    fbuf[1]=0x70;
+    fbuf[0]=0x27;								//服务器端口10091
+    fbuf[1]=0x6B;
     YS_PrmWriteOneItem(FLH_PRM_SERV_PORT,FLH_PRM_SERV_PORT_LEN,fbuf);
 
     sprintf(StrDat,"cmnet");					//APN信息
@@ -396,7 +398,7 @@ void YS_PrmSetFactroyWorkParam(void)
     fbuf[1]=0xB4;
     YS_PrmWriteOneItem(FLH_PRM_ACC_TIME,FLH_PRM_ACC_TIME_LEN,fbuf); //ACCLT*/
 
-    fbuf[0]=0;
+    fbuf[0]=1;
     YS_PrmWriteOneItem(FLH_PRM_SLEEP_CTRL,FLH_PRM_SLEEP_CTRL_LEN,fbuf); //SLEEP ENABLE
     fbuf[0]=0x00;
     fbuf[1]=0x3c;

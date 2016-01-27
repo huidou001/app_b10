@@ -180,7 +180,15 @@ void YS_FactoryMode(void)
         DispBuf[pos]=',';
         pos++;
 
-        DispBuf[pos]= t_FlowInfo.LogOKFlag+0x30;                                      //GSM信号
+        if (t_SysRunStatus.RunFlow = YS_RUN_FLOW_IDLE_DEAL)
+        {
+            DispBuf[pos]= 0x31;                                      //GSM信号
+        }
+        else
+        {
+            DispBuf[pos]= 0x30;                                      //GSM信号
+        }
+
         pos++;
         DispBuf[pos]=',';
         pos++;
@@ -200,6 +208,10 @@ void YS_FactoryMode(void)
         DispBuf[pos]=',';
         pos++;
 
+        DispBuf[pos]=sjfun_Gpio_Read_Value(YS_PIN_NO_WAKEUP)+0x30;                          		//acc
+        pos++;
+        DispBuf[pos]=',';
+        pos++;
     }
     DispBuf[pos]=0x0d;                                 //回车换行
     pos++;
@@ -1339,6 +1351,8 @@ void YS_RunEntrySleepMode(void)
 
     sjfun_Sys_Sleep_Enable();						//允许MTK 进入休眠模式
     t_SysRunStatus.SleepStatus=1; 				//设置休眠状态
+
+    sjfun_VmcSignControl(0);
     sjfun_Gps_Stop(TRUE);  						//GPS 处理模块关闭
     t_FlowInfo.GpsPowerFlag=FALSE;
     t_FlowInfo.OptDelay=0;
@@ -1357,11 +1371,13 @@ void YS_RunEntryWakeupMode(void)
     if(t_SysRunStatus.SleepStatus==1) //如果系统已进入休眠状态
     {
         t_FlowInfo.GpsPowerFlag=TRUE;
+        sjfun_VmcSignControl(1);
         sjfun_Gps_Start(TRUE);  //GPS 处理模块开启
         if(t_SysRunStatus.RunFlow==YS_RUN_FLOW_IDLE_DEAL)  //如果系统已处于正常连接状态，启动AGPS功能
         {
             YS_AGpsDealInterFace();
         }
+        sjfun_timer(GIS_TIMER_ID_4,200,YS_IODealLedTimerHandler);
     }
     t_SysRunStatus.SleepStatus=0;
     t_FlowInfo.SleepCount=0;
@@ -1496,18 +1512,31 @@ void YS_RunSleepCtrl(void)
         return;
     }
 
-    if(t_SysRunStatus.SleepStatus==0)  //如果已经进入休眠状态
+    if(t_SysRunStatus.SleepStatus==0)  //唤醒状态
     {
-        YS_PrmReadOneItem(FLH_PRM_SLEEP_TIME,FLH_PRM_SLEEP_TIME_LEN,fbuf); //自动休眠时间
-        SleepSetTime=fbuf[0]+fbuf[1];
-
-        t_FlowInfo.VibSleepCount++;
-        if(t_FlowInfo.VibSleepCount>=SleepSetTime)
+        if (t_SysRunStatus.AccStatus == 0)
         {
-            t_FlowInfo.VibSleepCount = 0;
-            YS_RunEntrySleepMode();
+            YS_PrmReadOneItem(FLH_PRM_SLEEP_TIME,FLH_PRM_SLEEP_TIME_LEN,fbuf); //自动休眠时间
+            SleepSetTime=fbuf[0]+fbuf[1];
+
+            t_FlowInfo.VibSleepCount++;
+            if(t_FlowInfo.VibSleepCount>=10)
+            {
+                t_FlowInfo.VibSleepCount = 0;
+                YS_RunEntrySleepMode();
+            }
         }
     }
+    else
+    {
+        if (t_SysRunStatus.AccStatus == 1)
+        {
+            YS_RunEntryWakeupMode();
+            t_FlowInfo.VibSleepCount =0;
+        }
+    }
+
+
 }
 
 /*-----------------------------------------------------------------------------------------
@@ -2086,8 +2115,8 @@ void YS_RunAppWorkFlowManage(void)
             {
                 t_FlowInfo.SocOk = 1;
                 t_FlowInfo.SocketErrTimes=0;
-//                t_SysRunStatus.RunFlow=YS_RUN_FLOW_SEVLOG_BEGIN;
-                t_SysRunStatus.RunFlow=YS_RUN_FLOW_REGSERVER_BEGIN;
+                t_SysRunStatus.RunFlow=YS_RUN_FLOW_SEVLOG_BEGIN;
+//                t_SysRunStatus.RunFlow=YS_RUN_FLOW_REGSERVER_BEGIN;
             }
             else
             {
@@ -2201,10 +2230,15 @@ void YS_RunAppWorkFlowManage(void)
 //            YS_RunTraceCtrl();			//上报TRACE 数据
             YS_RunIdlePosCtrl();	//定时数据上报控制
             YS_RunIdleCANCtrl();
-            if(t_FlowInfo.HeartTimes>=RUN_HEART_TIMES_DEF)
+//            if(t_FlowInfo.HeartTimes>=RUN_HEART_TIMES_DEF)
+//            {
+//                sjfun_Socket_Close(t_FlowInfo.SocketID);
+//                t_SysRunStatus.RunFlow=YS_RUN_FLOW_RDCON_BEGIN;
+//            }
+            if (t_SysRunStatus.SleepStatus==1)
             {
-                sjfun_Socket_Close(t_FlowInfo.SocketID);
-                t_SysRunStatus.RunFlow=YS_RUN_FLOW_RDCON_BEGIN;
+//                t_SysRunStatus.RunFlow=YS_RUN_FLOW_FIGHT_BEGIN;
+                t_SysRunStatus.RunFlow=YS_RUN_FLOW_SLEEP_BEGIN;
             }
             break;
 

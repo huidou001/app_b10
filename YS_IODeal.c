@@ -19,9 +19,15 @@ void YS_IODealLedTimerHandler(void)
     t_Sys_Run_Status t_GetStatus;
     t_Gps_Data_Info	t_GetGps;
 
+
     YS_GpsGetPosData(&t_GetGps);
     YS_RunGetSystemStatus(&t_GetStatus);
 
+    if (t_GetStatus.AccStatus == 0)
+    {
+        sjfun_SetKPLED(0);
+        return;
+    }
     if(t_GetGps.Effective==TRUE)	//GPS 指示灯控制
     {
         t_GpioCtrlManage.GpsLedStatus=1;				//GPS 定位时，指示灯常亮
@@ -87,15 +93,15 @@ void YS_IODealInit(void)
 //    sjfun_Gpio_Set_Direction(YS_PIN_NO_LED_GSM,0);
 //    sjfun_Gpio_Write_Value(YS_PIN_NO_LED_GSM,0);
 
-    sjfun_Gpio_Set_Mode(YS_PIN_NO_GPS_PWR, 0);
-    sjfun_Gpio_Set_Direction(YS_PIN_NO_GPS_PWR,0);
-    sjfun_Gpio_Write_Value(YS_PIN_NO_GPS_PWR,1);
+//    sjfun_Gpio_Set_Mode(YS_PIN_NO_WAKEUP, 0);
+//    sjfun_Gpio_Set_Direction(YS_PIN_NO_WAKEUP,1);
+//    sjfun_Gpio_Write_Value(YS_PIN_NO_WAKEUP,0);
 
-    sjfun_Gpio_Set_Mode(YS_PIN_NO_ACC_PWR, 0);
-    sjfun_Gpio_Set_PullEN(YS_PIN_NO_ACC_PWR,1);
-    sjfun_Gpio_Set_PullValue(YS_PIN_NO_ACC_PWR,1);
-    sjfun_Gpio_Set_Direction(YS_PIN_NO_ACC_PWR,1);
-    sjfun_Gpio_Write_Value(YS_PIN_NO_ACC_PWR,1);
+    sjfun_Gpio_Set_Mode(YS_PIN_NO_WAKEUP, 0);
+    sjfun_Gpio_Set_PullEN(YS_PIN_NO_WAKEUP,1);
+    sjfun_Gpio_Set_PullValue(YS_PIN_NO_WAKEUP,1);
+    sjfun_Gpio_Set_Direction(YS_PIN_NO_WAKEUP,1);
+    sjfun_Gpio_Write_Value(YS_PIN_NO_WAKEUP,1);
 
 
     sjfun_Gpio_Set_Mode(YS_PIN_NO_OBD_RST, 0);
