@@ -679,7 +679,6 @@ void	YS_WebServiceRsqFlow(void)
             else if(t_WebManage.RsqDataFailFlag==1)
             {
                 YS_GprsDebugString("Web rsq data fail",0);
-                //YS_SmsAckSmsDeal(DW_SMS_ERR_CONFAIL,t_WebManage.a_PhoneData[t_WebManage.CmdReadPoint], t_WebManage.a_PhoneLen[t_WebManage.CmdReadPoint]);
                 YS_RunWebSocketClose();
                 YS_WebDWRsqDeleteOne();
 #if 1
