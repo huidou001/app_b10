@@ -37,8 +37,9 @@
 #define SERV_UP_CMD_POS_QUEUE			0x13	//定位数据包插入队列
 #define SERV_UP_CMD_CARCTL              		0x14        //车辆控制
 #define SERV_UP_CMD_CAN                 0x15        //静态CAN数据包
-#define SERV_UP_CMD_SIMINFO                 0x16    //SIM卡信息包
-#define SERV_UP_CMD_OBDINFO                 0x17    //读取指定OBD数据
+#define SERV_UP_CMD_CANOFF                 0x16        //熄火
+#define SERV_UP_CMD_SIMINFO                 0x17    //SIM卡信息包
+#define SERV_UP_CMD_OBDINFO                 0x18    //读取指定OBD数据
 
 #define INTER_CMD_SET_JTB_PRM				0x1000
 #define INTER_CMD_READ_JTB_PRM_COM		0x1001

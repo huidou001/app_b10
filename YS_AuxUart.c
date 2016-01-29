@@ -648,6 +648,7 @@ bool YS_OBDParaseCarStop(u8 *buf, u16 len)
             }
 
             num = count;
+            t_ObdMainInfo.ObdOffStrlen = 0;
             for ( j = 0; j<num; j++ )
             {
                 tpos=pos;	//定位到第一个','
@@ -676,56 +677,113 @@ bool YS_OBDParaseCarStop(u8 *buf, u16 len)
                 }
                 pos++;
                 fbuf[count]=0;
-                value = atoi((char *)fbuf);
-                ycsj_debug("%s,j=%d, value = %d\r\n",fbuf,j,value);
-//                switch (j)
-//                {
-//                    case 0 :
-//                        break;
-//                    case 1 :
+//                value = atoi((char *)fbuf);
+//                ycsj_debug("%s,j=%d, value = %d\r\n",fbuf,j,value);
+                switch (j)
+                {
+                    case 0 :
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'R';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'I';
+                        t_ObdMainInfo.ObdOffStrlen ++;
 
-//                        break;
-//                    case 2 :
+                        break;
+                    case 1 :
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'R';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'A';
+                        t_ObdMainInfo.ObdOffStrlen ++;
 
-//                        break;
-//                    case 3 :
+                        break;
+                    case 2 :
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'S';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'A';
+                        t_ObdMainInfo.ObdOffStrlen ++;
 
-//                        break;
-//                    case 4 :
+                        break;
+                    case 3 :
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'S';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'V';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        break;
+                    case 4 :
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'A';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'A';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        break;
+                    case 5 :
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'M';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'T';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        break;
+                    case 6 :
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'F';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'T';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        break;
+                    case 7 :
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'B';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'S';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        break;
+                    case 8 :
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'R';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'S';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        break;
+                    case 9 :
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'A';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'F';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        break;
+                    case 10 :
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'F';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'M';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        break;
+                    case 11 :
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'F';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'F';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        break;
+                    case 12 :
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'T';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'S';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        break;
+                    case 13 :
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'S';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  'S';
+                        t_ObdMainInfo.ObdOffStrlen ++;
+                        break;
+                    default:
+                        break;
+                }
 
-//                        break;
-//                    case 5 :
-
-//                        break;
-//                    case 6 :
-
-//                        break;
-//                    case 7 :
-
-//                        break;
-//                    case 8 :
-
-//                        break;
-//                    case 9 :
-
-//                        break;
-//                    case 10 :
-
-//                        break;
-//                    case 11 :
-
-//                        break;
-//                    case 12 :
-
-//                        break;
-//                    case 13 :
-
-//                        break;
-//                    default:
-//                        break;
-//                }
+                for(i=0; i<count; i++)
+                {
+                    t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  fbuf[i];
+                    t_ObdMainInfo.ObdOffStrlen ++;
+                }
+                t_ObdMainInfo.ObdOffStr[t_ObdMainInfo.ObdOffStrlen] =  '|';
+                t_ObdMainInfo.ObdOffStrlen ++;
 
             }
+
+            ycsj_debug("\r %s \r", t_ObdMainInfo.ObdOffStr);
+            YS_GprsServerSendInterface(SERV_UP_CMD_CANOFF, NULL,0);
             return(TRUE);
         }
         else
@@ -788,6 +846,22 @@ u16  YS_ObdCarPackage(u8 *PackBuf)
 }
 
 /*-----------------------------------------------------------------------------------------
+函数名：YS_ObdCarOffPackage
+功能说明：获取一个Car数据
+修改记录：
+-------------------------------------------------------------------------------------------*/
+u16  YS_ObdCarOffPackage(u8 *PackBuf)
+{
+    u8 i;
+    for ( i = 0; i < t_ObdMainInfo.ObdOffStrlen; i++ )
+    {
+        PackBuf[i] = t_ObdMainInfo.ObdOffStr[i];
+    }
+
+    return t_ObdMainInfo.ObdOffStrlen;
+}
+
+/*-----------------------------------------------------------------------------------------
 函数名：
 功能说明：
 修改记录：
@@ -808,7 +882,7 @@ void YS_OBDDataSourceInput(u8 *dbuf, u16 dlen)
         {
             if (t_GetStatus.AccStatus == 0)
             {
-              YS_RunAccStatusBrush(1);
+                YS_RunAccStatusBrush(1);
             }
             GetTailOK=FALSE;
             count=0;
@@ -944,6 +1018,7 @@ void YS_AuxBufParaseDeal(void)
 -------------------------------------------------------------------------------------------*/
 void YS_AuxBufAddData(u8 *dbuf, u16 dlen)
 {
+#if 1
     u16 i;
     if((t_AuxParaseBuf.DataLen+dlen)<=YS_GPS_BUF_LEN) //如果缓冲区可存贮
     {
@@ -955,5 +1030,17 @@ void YS_AuxBufAddData(u8 *dbuf, u16 dlen)
         sjfun_stoptimer(GIS_TIMER_ID_2);						//开始解析定时器
         sjfun_timer(GIS_TIMER_ID_2,100,YS_AuxBufParaseDeal);
     }
+#else
+    t_Sys_Run_Status	t_GetStatus;
+    YS_RunGetSystemStatus(&t_GetStatus);
+    if (t_GetStatus.RunFlow == YS_RUN_FLOW_IDLE_DEAL)
+    {
+        if(YS_GprsSendDataToServer(dbuf, dlen) == FALSE)
+        {
+            YS_SysRsqSystemRST(YS_RST_FLAG_LOSE_NET);
+//            t_GetStatus.RunFlow=YS_RUN_FLOW_RDCON_BEGIN;
+        }
+    }
+#endif
 }
 

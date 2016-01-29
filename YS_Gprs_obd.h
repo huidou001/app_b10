@@ -13,6 +13,8 @@ extern u16 YS_GprsPackGpsPackage(u8 *PackBuf);
 
 extern u16 YS_GprsPackCarObdPackage(u8 *PackBuf);
 
+extern u16 YS_GprsPackCarObdOffPackage(u8 *PackBuf);
+
 extern u16 YS_GprsPackWarnPackage(u8 *PackBuf);
 
 extern u16 YS_GprsPackObdDstPackage(u8 *PackBuf);

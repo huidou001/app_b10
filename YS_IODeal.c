@@ -23,7 +23,7 @@ void YS_IODealLedTimerHandler(void)
     YS_GpsGetPosData(&t_GetGps);
     YS_RunGetSystemStatus(&t_GetStatus);
 
-    if (t_GetStatus.AccStatus == 0)
+    if (t_GetStatus.SleepStatus == 1)
     {
         sjfun_SetKPLED(0);
         return;
@@ -310,20 +310,14 @@ void YS_IOInputInfoDeal(void)
     }
 
 //    YS_RunAccStatusBrush(1);
-#if 0
-    if (sjfun_Gpio_Read_Value(YS_PIN_NO_ACC_PWR) == 0)//ACC 接口状态
+//    sjfun_Gpio_Read_Value(YS_PIN_NO_WAKEUP)
+#if 1
+    if (sjfun_Gpio_Read_Value(YS_PIN_NO_WAKEUP) == 1)//ACC 接口状态
     {
         YS_RunAccStatusBrush(1);
         if (BankACCstatus == FALSE)
         {
             BankACCstatus = TRUE;
-//            YS_WebAddRequest(FALSE);
-        }
-        if (YS_RunGetGpsPower()==FALSE)
-        {
-//            YS_RunSetGpsPower(TRUE);
-//            sjfun_Gpio_Write_Value(YS_PIN_NO_GPS_PWR,1);//打开GPS电源
-//            sjfun_Gps_Start(0);
         }
     }
     else
@@ -332,12 +326,6 @@ void YS_IOInputInfoDeal(void)
         if (BankACCstatus == TRUE)
         {
             BankACCstatus = FALSE;
-        }
-        if (YS_RunGetGpsPower()==TRUE)
-        {
-//            YS_RunSetGpsPower(FALSE);
-//            sjfun_Gpio_Write_Value(YS_PIN_NO_GPS_PWR,0);//关闭GPS电源
-//            sjfun_Gps_Stop(0);
         }
     }
 #endif

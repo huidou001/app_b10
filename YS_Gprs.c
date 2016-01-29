@@ -495,6 +495,11 @@ bool YS_GprsServerSendInterface(u8 CmdID, u8 *dbuf, u16 dlen)
             YS_GprsDebugString("Ys gprs obd pack len",PackLen);
             break;
 
+        case SERV_UP_CMD_CANOFF:  //汽车熄火行程数据包
+            PackLen=YS_GprsPackCarObdOffPackage(PackBuf);
+            YS_GprsDebugString("Ys gprs obd OFF pack len",PackLen);
+            break;
+
         case SERV_UP_CMD_ACK:
 //            PackLen=YS_GprsSendAckPackage(PackBuf,dbuf,dbuf[dlen-1]);
             break;

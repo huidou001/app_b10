@@ -180,7 +180,7 @@ void YS_FactoryMode(void)
         DispBuf[pos]=',';
         pos++;
 
-        if (t_SysRunStatus.RunFlow = YS_RUN_FLOW_IDLE_DEAL)
+        if (t_SysRunStatus.RunFlow == YS_RUN_FLOW_IDLE_DEAL)
         {
             DispBuf[pos]= 0x31;                                      //GSM信号
         }
@@ -1082,6 +1082,11 @@ void YS_RunSocketSendData(u8 *dbuf, u16 dlen)
     ycsj_debug((char *)DbgBuf);
 
     SendRlt=sjfun_Socket_Send(t_FlowInfo.SocketID, dbuf, dlen);
+    if (SendRlt < 0)
+    {
+        ycsj_debug("gprs send fail %d", SendRlt);
+        t_SysRunStatus.RunFlow=YS_RUN_FLOW_RDCON_BEGIN;
+    }
 }
 
 void YS_RunSetSeverReg(void)
@@ -1108,28 +1113,14 @@ void YS_RunIdleHeartCtrl(void)
         t_FlowInfo.HeartTimes++;
         if(t_FlowInfo.HeartTimes<=RUN_HEART_TIMES_DEF)
         {
-            YS_GprsServerSendInterface(SERV_UP_CMD_HEART, NULL,0);
+            if (YS_GprsServerSendInterface(SERV_UP_CMD_HEART, NULL,0) == FALSE)
+            {
+                t_SysRunStatus.RunFlow=YS_RUN_FLOW_RDCON_BEGIN;
+            }
         }
     }
 }
 
-/*-----------------------------------------------------------------------------------------
-函数名：YS_RunIdleCanCtrl
-功能说明：CAN数据发送处理
-修改记录：
--------------------------------------------------------------------------------------------*/
-void YS_RunIdleCanCtrl(void)
-{
-    u16	HeartDelaySet;
-    u8 	fbuf[4];
-
-    t_FlowInfo.CanDelay ++;
-    if(t_FlowInfo.CanDelay>=30)
-    {
-        t_FlowInfo.CanDelay=0;
-        YS_GprsServerSendInterface(SERV_UP_CMD_CAN, NULL,0);
-    }
-}
 /*-----------------------------------------------------------------------------------------
 函数名：YS_RunIdleHeartCtrl
 功能说明：心跳包发送处理
@@ -1167,7 +1158,12 @@ void YS_RunIdlePosCtrl(void)
     if(t_FlowInfo.PosDelay >= 5)
     {
         t_FlowInfo.PosDelay=0;
-        YS_GprsServerSendInterface(SERV_UP_CMD_POS, NULL,0);
+//        YS_GprsServerSendInterface(SERV_UP_CMD_POS, NULL,0);
+        if (YS_GprsServerSendInterface(SERV_UP_CMD_POS, NULL,0) == FALSE)
+        {
+            t_SysRunStatus.RunFlow=YS_RUN_FLOW_RDCON_BEGIN;
+        }
+
     }
 }
 
@@ -1190,10 +1186,14 @@ void YS_RunIdleCANCtrl(void)
     YS_PrmReadOneItem(FLH_PRM_CAN_TIME,FLH_PRM_CAN_TIME_LEN,fbuf);
     PosDelaySet=fbuf[0]*256+fbuf[1];
     t_FlowInfo.ObdDelay++;
-    if(t_FlowInfo.ObdDelay >= PosDelaySet)
+    if(t_FlowInfo.ObdDelay >= 5)
     {
         t_FlowInfo.ObdDelay=0;
-        YS_GprsServerSendInterface(SERV_UP_CMD_CAN, NULL,0);
+//        YS_GprsServerSendInterface(SERV_UP_CMD_CAN, NULL,0);
+        if (YS_GprsServerSendInterface(SERV_UP_CMD_CAN, NULL,0) == FALSE)
+        {
+            t_SysRunStatus.RunFlow=YS_RUN_FLOW_RDCON_BEGIN;
+        }
 //        if (YS_OBDGetFault()>0)
 //        {
 //            YS_GprsServerSendInterface(SERV_UP_CMD_FAULT, NULL,0);
@@ -2044,15 +2044,16 @@ void YS_RunAppWorkFlowManage(void)
                         }
                         else
                         {
-                            YS_PrmReadOneItem(FLH_PRM_FLI_ENABLE,FLH_PRM_FLI_ENABLE_LEN,fbuf);
-                            if(fbuf[0]==1)
-                            {
-                                YS_EntryGsmSleepMode();
-                            }
-                            else
-                            {
-                                YS_RunEntrySleepMode();	//进入休眠模式
-                            }
+                            YS_SysRsqSystemRST(YS_RST_FLAG_LOSE_NET);
+//                            YS_PrmReadOneItem(FLH_PRM_FLI_ENABLE,FLH_PRM_FLI_ENABLE_LEN,fbuf);
+//                            if(fbuf[0]==1)
+//                            {
+//                                YS_EntryGsmSleepMode();
+//                            }
+//                            else
+//                            {
+//                                YS_RunEntrySleepMode();	//进入休眠模式
+//                            }
                         }
                         break;
                 }

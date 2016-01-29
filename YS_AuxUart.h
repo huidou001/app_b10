@@ -43,6 +43,8 @@ typedef  struct
         u8   Gz;//z轴加速度
         u16  ObdStrlen;
         u8   ObdStr[200]; //字符数据
+        u16  ObdOffStrlen;
+        u8   ObdOffStr[300]; //字符数据
 }t_Obd_Main_Info;
 
 extern void YS_AuxBufAddData(u8 *dbuf, u16 dlen);
@@ -56,6 +58,8 @@ extern void YS_OBDGetMainInfo(t_Obd_Main_Info *pt_GetObdMain);
 extern void YS_ObdGetCarData(t_Obd_Main_Info *pt_ObdMainInfo);
 
 extern u16  YS_ObdCarPackage(u8 *PackBuf);
+
+extern u16  YS_ObdCarOffPackage(u8 *PackBuf);
 
 extern void YS_OBDRstInit(bool flag);
 

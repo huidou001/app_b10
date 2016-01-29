@@ -12,7 +12,7 @@ t_Web_Server_Manage	t_WebManage;
 
 t_File_Para WebFilePara;
 // http://qq.dogcare.com.cn
-char *g_http_pkg = "GET /zhf/test.txt HTTP/1.1";
+
 u32 crcrlt=0xffffffff;
 static u32  CRC32_Table[256] =
 {

@@ -405,6 +405,53 @@ u16 YS_GprsPackCarObdPackage(u8 *PackBuf)
 }
 
 /*-----------------------------------------------------------------------------------------
+函数名：YS_GprsPackCarObdOffPackage
+功能说明：封装一个熄火车况数据
+修改记录：
+-------------------------------------------------------------------------------------------*/
+u16 YS_GprsPackCarObdOffPackage(u8 *PackBuf)
+{
+    u16 PackLen,pos,len;
+    u8 i,fbuf[20], tempbuf[200];
+    t_Obd_Main_Info t_GetObdStatus;
+
+    YS_ObdGetCarData(&t_GetObdStatus);
+    pos = 0;
+    tempbuf[pos] = '0';
+    pos++;
+    tempbuf[pos] = '|';
+    pos++;
+    len=YS_GprsAddUnixTime(&tempbuf[pos]);//UNIX时间
+    pos+=len;
+    tempbuf[pos] = '|';
+    pos++;
+
+    tempbuf[pos] = 'X';
+    pos++;
+    tempbuf[pos] = '0';
+    pos++;
+    tempbuf[pos] = '0';
+    pos++;
+    tempbuf[pos] = '1';
+    pos++;
+    tempbuf[pos] = '|';
+    pos++;
+    len = YS_ObdCarOffPackage(&tempbuf[pos]);
+    pos += len;
+
+    PackLen=YS_GprsDealPtlSend(0x60,tempbuf,pos,PackBuf);
+
+    if (len<100)
+    {
+        return 0;
+    }
+    else
+    {
+        return(PackLen);
+    }
+}
+
+/*-----------------------------------------------------------------------------------------
 函数名：YS_GprsPackWarnPackage
 功能说明：封装一个车辆告警数据
 修改记录：

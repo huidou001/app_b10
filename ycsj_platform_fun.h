@@ -33,7 +33,7 @@ extern U32 sjfun_PPP_Interface(char *apn, char *ApnUser, char *ApnPassWord);
 
 extern bool sjfun_Socket_Create(U32 AcctID, U8 *SocketID, U8 *IPBuf, U16 Port, U8 SocketType);
 
-extern U32 sjfun_Socket_Send(U8 SocketID, U8 *dbuf, U16 dlen);
+extern int sjfun_Socket_Send(U8 SocketID, U8 *dbuf, U16 dlen);
 
 extern void sjfun_Socket_Close(U8 SocketID);
 
