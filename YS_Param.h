@@ -329,6 +329,7 @@ typedef struct
     u8  packnum;
     u32 writepos;
     u32 readpos;
+    u32 filelen;
 }t_File_Para;
 
 extern void YS_PrmReadOneItem(u16 PrmID, u16 dlen, u8 *FillBuf );

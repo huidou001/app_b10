@@ -26,7 +26,7 @@
 #define UART_CMD_HEAD_ID            "#ID#"
 #define UART_CMD_HEAD_PTE           "#PTE#"
 #define UART_CMD_HEAD_DBG           "#DEBUG#"
-
+#define UART_CMD_HEAD_UPDATE        "#UPDATE#"
 enum
 {
     UART_ACK_IP_ERR,
@@ -1622,6 +1622,10 @@ bool YS_UartInputCmdControl(u8 *dbuf, u8 dlen)
     else if(YS_UartCompHeadDeal(UART_CMD_HEAD_DBG,dbuf,dlen)==TRUE)
     {
         SetDebugLog();
+    }
+    else if(YS_UartCompHeadDeal(UART_CMD_HEAD_UPDATE,dbuf,dlen)==TRUE)
+    {
+        YS_WebAddRequest();
     }
     return FALSE;
 }

@@ -424,8 +424,8 @@ void YS_WebDWRsqDeleteOne(void)
 }
 
 /*-----------------------------------------------------------------------------------------
-函数名：YS_WebPosRsqDeal
-功能说明：发送位置请求包处理
+函数名：YS_WebUpdateRsqDeal
+功能说明：判断升级请求
 修改记录：
 -------------------------------------------------------------------------------------------*/
 void YS_WebUpdateRsqDeal(void)
@@ -451,8 +451,8 @@ void YS_WebUpdateRsqDeal(void)
 }
 
 /*-----------------------------------------------------------------------------------------
-函数名：YS_WebPosRsqDeal
-功能说明：发送位置请求包处理
+函数名：YS_WebUpdateRsqDataDeal
+功能说明：请求升级
 修改记录：
 -------------------------------------------------------------------------------------------*/
 void YS_WebUpdateRsqDataDeal(void)
@@ -679,7 +679,6 @@ void	YS_WebServiceRsqFlow(void)
             else if(t_WebManage.RsqDataFailFlag==1)
             {
                 YS_GprsDebugString("Web rsq data fail",0);
-                //YS_SmsAckSmsDeal(DW_SMS_ERR_CONFAIL,t_WebManage.a_PhoneData[t_WebManage.CmdReadPoint], t_WebManage.a_PhoneLen[t_WebManage.CmdReadPoint]);
                 YS_RunWebSocketClose();
                 YS_WebDWRsqDeleteOne();
 #if 1
@@ -854,14 +853,25 @@ void YS_WebFirstPackRsqParase(u8 *buf, u16 len)
     else
     {
         t_WebManage.RsqUpdateOKFlag=1;
-        ldat.b[AVL_LSTOR_FIR] = buf[pos+GetLen+1];
-        ldat.b[AVL_LSTOR_SEC] = buf[pos+GetLen+2];
-        ldat.b[AVL_LSTOR_THI] = buf[pos+GetLen+3];
-        ldat.b[AVL_LSTOR_FOR] = buf[pos+GetLen+4];
+//        ldat.b[AVL_LSTOR_FIR] = buf[pos+GetLen+1];
+//        ldat.b[AVL_LSTOR_SEC] = buf[pos+GetLen+2];
+//        ldat.b[AVL_LSTOR_THI] = buf[pos+GetLen+3];
+//        ldat.b[AVL_LSTOR_FOR] = buf[pos+GetLen+4];
 
+        ldat.b[AVL_LSTOR_FIR] = buf[pos+GetLen+4];
+        ldat.b[AVL_LSTOR_SEC] = buf[pos+GetLen+3];
+        ldat.b[AVL_LSTOR_THI] = buf[pos+GetLen+2];
+        ldat.b[AVL_LSTOR_FOR] = buf[pos+GetLen+1];
+        t_WebManage.CrcCode = ldat.l;
         ycsj_debug("\r\n-1-THE crc code is:%lx\r\n",ldat.l);
 
-        t_WebManage.CrcCode = ldat.l;
+        ldat.b[AVL_LSTOR_FIR] = buf[pos+GetLen+9];
+        ldat.b[AVL_LSTOR_SEC] = buf[pos+GetLen+8];
+        ldat.b[AVL_LSTOR_THI] = buf[pos+GetLen+7];
+        ldat.b[AVL_LSTOR_FOR] = buf[pos+GetLen+6];
+
+        WebFilePara.filelen = ldat.l;
+        ycsj_debug("the file len%lx\r\n",WebFilePara.filelen);
     }
 }
 
@@ -876,6 +886,8 @@ u32 YS_WebFirstPackDataParase(u8 *buf, u16 len)
     u32 writed=0;
     int res;
     u16 i,j,pos;
+    Avl_ULong ldat;
+
     for  ( i = 256; i<len; i++ )
     {
         if ((buf[i] == 0x0D)&&(buf[i+1] == 0x0A)&&(buf[i+2] == 0x0D)&&(buf[i+3] == 0x0A))
@@ -885,6 +897,7 @@ u32 YS_WebFirstPackDataParase(u8 *buf, u16 len)
         }
     }
     crcrlt = crc32(&buf[pos], len-pos, crcrlt);
+
     res = sjfun_File_Write(WebFilePara.filehandle, &buf[pos], len-pos, &writed);
     YS_GprsDebugString("sjfun_File_Write rlt",res);
     return writed;
@@ -916,6 +929,22 @@ void  YS_WebServiceDataParase(u8 *buf, u16 len)
             crcrlt = crc32(buf, len, crcrlt);
             res = sjfun_File_Write(WebFilePara.filehandle, buf, len, &writed);
             WebFilePara.writepos += writed;
+            if (WebFilePara.writepos == WebFilePara.filelen)
+            {
+                crcrlt = crcrlt^0xffffffff;
+                if(t_WebManage.CrcCode == crcrlt)
+                {
+                    ycsj_debug("the CrcCode is right!\r\n");
+                }
+                else //校验码 错误 删除
+                {
+                    ycsj_debug("the CrcCode is wrong!\r\n");
+                }
+                ycsj_debug("the crc rlt is:0x%lx", crcrlt);
+                ycsj_debug("the update file len is:0x%lx", WebFilePara.writepos);
+                YS_WebSocketClose();
+                return;
+            }
         }
 
         WebFilePara.packnum ++;
@@ -931,6 +960,7 @@ void  YS_WebServiceDataParase(u8 *buf, u16 len)
                 ycsj_debug("the CrcCode is wrong!\r\n");
             }
             ycsj_debug("the crc rlt is:0x%lx", crcrlt);
+            ycsj_debug("the update file len is:0x%lx", WebFilePara.writepos);
             YS_WebSocketClose();
         }
     }

@@ -5,7 +5,7 @@
 
 #define Web_Cmd_Buf_NUM	5
 #define Web_SCK_WAIT_DELAY	30
-#define Web_RSQ_SEND_DELAY	180
+#define Web_RSQ_SEND_DELAY	120
 #define Web_RSQ_SEND_TIMES	1
 #define Web_Exit_Wait_Delay		5
 

@@ -882,7 +882,7 @@ void YS_OBDDataSourceInput(u8 *dbuf, u16 dlen)
         {
             if (t_GetStatus.AccStatus == 0)
             {
-                YS_RunAccStatusBrush(1);
+//                YS_RunAccStatusBrush(1);
             }
             GetTailOK=FALSE;
             count=0;
@@ -898,7 +898,6 @@ void YS_OBDDataSourceInput(u8 *dbuf, u16 dlen)
 
             if(GetTailOK==TRUE) //如果存在行结束字符
             {
-//                YS_OBDOneLinesDeal(&dbuf[tpos], count); //处理一行数据
                 YS_OBDParaseCarRun(&dbuf[tpos], count);//处理车辆运行数据
                 tpos+=count; //删除当前检索行
                 len-=count;
@@ -911,14 +910,14 @@ void YS_OBDDataSourceInput(u8 *dbuf, u16 dlen)
         // AT POWERON  &&  CONNECTED 1ECU  汽车点火
         else if (((dbuf[tpos]=='E')&&(dbuf[tpos+1]=='R')&&(dbuf[tpos+2]=='O')&&(dbuf[tpos+3]=='N'))||((dbuf[tpos] > '0')&&(dbuf[tpos+1]=='E')&&(dbuf[tpos+2]=='C')&&(dbuf[tpos+3]=='U')))
         {
-            YS_RunAccStatusBrush(1);
+//            YS_RunAccStatusBrush(1);
             len -= 4;
             tpos += 4;
         }
         //ATPOWEROFF$MAXRPM.... 熄火数据统计
         else if (((dbuf[tpos]=='O')&&(dbuf[tpos+1]=='F')&&(dbuf[tpos+2]=='F')&&(dbuf[tpos+3]=='$'))||((dbuf[tpos]=='0')&&(dbuf[tpos+1]=='E')&&(dbuf[tpos+2]=='C')&&(dbuf[tpos+3]=='U')))
         {
-            YS_RunAccStatusBrush(0);
+//            YS_RunAccStatusBrush(0);
             GetTailOK=FALSE;
             count=0;
             for(i=0; i<len; i++) //from '$' begin test

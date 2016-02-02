@@ -1113,10 +1113,7 @@ void YS_RunIdleHeartCtrl(void)
         t_FlowInfo.HeartTimes++;
         if(t_FlowInfo.HeartTimes<=RUN_HEART_TIMES_DEF)
         {
-            if (YS_GprsServerSendInterface(SERV_UP_CMD_HEART, NULL,0) == FALSE)
-            {
-                t_SysRunStatus.RunFlow=YS_RUN_FLOW_RDCON_BEGIN;
-            }
+            YS_GprsServerSendInterface(SERV_UP_CMD_HEART, NULL,0);
         }
     }
 }
@@ -1159,10 +1156,7 @@ void YS_RunIdlePosCtrl(void)
     {
         t_FlowInfo.PosDelay=0;
 //        YS_GprsServerSendInterface(SERV_UP_CMD_POS, NULL,0);
-        if (YS_GprsServerSendInterface(SERV_UP_CMD_POS, NULL,0) == FALSE)
-        {
-            t_SysRunStatus.RunFlow=YS_RUN_FLOW_RDCON_BEGIN;
-        }
+        YS_GprsServerSendInterface(SERV_UP_CMD_POS, NULL,0);
 
     }
 }
@@ -1190,10 +1184,7 @@ void YS_RunIdleCANCtrl(void)
     {
         t_FlowInfo.ObdDelay=0;
 //        YS_GprsServerSendInterface(SERV_UP_CMD_CAN, NULL,0);
-        if (YS_GprsServerSendInterface(SERV_UP_CMD_CAN, NULL,0) == FALSE)
-        {
-            t_SysRunStatus.RunFlow=YS_RUN_FLOW_RDCON_BEGIN;
-        }
+        YS_GprsServerSendInterface(SERV_UP_CMD_CAN, NULL,0);
 //        if (YS_OBDGetFault()>0)
 //        {
 //            YS_GprsServerSendInterface(SERV_UP_CMD_FAULT, NULL,0);
@@ -2221,7 +2212,7 @@ void YS_RunAppWorkFlowManage(void)
             YS_RunTraceInit();
 //            YS_AGpsDealInterFace();
             t_SysRunStatus.RunFlow=YS_RUN_FLOW_IDLE_DEAL;
-            YS_WebAddRequest();
+//            YS_WebAddRequest();
             break;
 
         case YS_RUN_FLOW_IDLE_DEAL: 	//系统IDLE模式处理
