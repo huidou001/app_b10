@@ -577,14 +577,14 @@ void YS_PrmSetFactroyWorkParam(void)
     fbuf[1]=0x0a;
     YS_PrmWriteOneItem(FLH_PRM_CAN_TIME,FLH_PRM_CAN_TIME_LEN,fbuf);
 
-    fbuf[0] = 0xd4;
-    fbuf[1] = 0xc1;
-    fbuf[2] = 0x47;
-    fbuf[3] = 0x38;
-    fbuf[4] = 0x39;
-    fbuf[5] = 0x36;
-    fbuf[6] = 0x30;
-    fbuf[7] = 0x30;
+    fbuf[0] = 0xbe;
+    fbuf[1] = 0xa9;
+    fbuf[2] = 0x46;
+    fbuf[3] = 0x31;
+    fbuf[4] = 0x32;
+    fbuf[5] = 0x33;
+    fbuf[6] = 0x34;
+    fbuf[7] = 0x35;
     fbuf[8] = 0;
     YS_PrmWriteOneItem(FLH_JTB_PLATE_STRING,FLH_JTB_PLATE_STRING_LEN,fbuf);
 
