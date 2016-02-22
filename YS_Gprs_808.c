@@ -1812,6 +1812,7 @@ u16 YS_GprsPackObdInfoControl(u8 *ObdBuf, u8 *AddInfo, u16 obdlen, u8 *obdPrm)
             case 0x07 :
             case 0x08 :
             case 0x09 :
+            case 0x0a :
             case 0x0b :
             case 0x0e :
             case 0x0f :
@@ -1847,7 +1848,6 @@ u16 YS_GprsPackObdInfoControl(u8 *ObdBuf, u8 *AddInfo, u16 obdlen, u8 *obdPrm)
                 pos++;
                 break;
 
-            case 0x0a :
             case 0x10 :
             case 0x14 :
             case 0x15 :

@@ -122,5 +122,7 @@ extern  void YS_SetPowoffKeyMsg(void);
 extern void YS_SetShutDownLedFlag(void);
 
 extern void YS_IOACCDydReCount(void);
+
+extern void YS_IODealLedTimerHandler(void);
 #endif
 

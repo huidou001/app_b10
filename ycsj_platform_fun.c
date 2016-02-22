@@ -205,9 +205,9 @@ u8 sjfun_Socket_Create(U32 AcctID, U8 *SocketID, U8 *IPBuf, U16 Port, U8 SocketT
 }
 
 //SOCKET ·¢ËÍÊý¾Ý
- typedef U32 (*p_sjfun_Socket_Send_t)(U8 SocketID, U8 *dbuf, U16 dlen);
+ typedef int (*p_sjfun_Socket_Send_t)(U8 SocketID, U8 *dbuf, U16 dlen);
 p_sjfun_Socket_Send_t p_sjfun_Socket_Send=NULL;
-U32 sjfun_Socket_Send(U8 SocketID, U8 *dbuf, U16 dlen)
+int sjfun_Socket_Send(U8 SocketID, U8 *dbuf, U16 dlen)
 {
 	if(NULL == p_sjfun_Socket_Send)
 		p_sjfun_Socket_Send = (p_sjfun_Socket_Send_t)jt_get_sym_entry("Socket_Send");

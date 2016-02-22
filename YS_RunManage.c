@@ -180,7 +180,15 @@ void YS_FactoryMode(void)
         DispBuf[pos]=',';
         pos++;
 
-        DispBuf[pos]= t_FlowInfo.LogOKFlag+0x30;                                      //GSM信号
+        if (t_SysRunStatus.RunFlow == YS_RUN_FLOW_IDLE_DEAL)
+        {
+            DispBuf[pos]= 0x31;                                      //GSM信号
+        }
+        else
+        {
+            DispBuf[pos]= 0x30;                                      //GSM信号
+        }
+
         pos++;
         DispBuf[pos]=',';
         pos++;
@@ -1070,6 +1078,11 @@ void YS_RunSocketSendData(u8 *dbuf, u16 dlen)
     ycsj_debug((char *)DbgBuf);
 
     SendRlt=sjfun_Socket_Send(t_FlowInfo.SocketID, dbuf, dlen);
+    if (SendRlt < 0)
+    {
+        ycsj_debug("gprs send fail %d", SendRlt);
+        t_SysRunStatus.RunFlow=YS_RUN_FLOW_RDCON_BEGIN;
+    }
 }
 
 void YS_RunSetSeverReg(void)
@@ -1362,6 +1375,7 @@ void YS_RunEntryWakeupMode(void)
         {
             YS_AGpsDealInterFace();
         }
+        sjfun_timer(GIS_TIMER_ID_4,200,YS_IODealLedTimerHandler);
     }
     t_SysRunStatus.SleepStatus=0;
     t_FlowInfo.SleepCount=0;
@@ -2015,15 +2029,16 @@ void YS_RunAppWorkFlowManage(void)
                         }
                         else
                         {
-                            YS_PrmReadOneItem(FLH_PRM_FLI_ENABLE,FLH_PRM_FLI_ENABLE_LEN,fbuf);
-                            if(fbuf[0]==1)
-                            {
-                                YS_EntryGsmSleepMode();
-                            }
-                            else
-                            {
-                                YS_RunEntrySleepMode();	//进入休眠模式
-                            }
+                            YS_SysRsqSystemRST(YS_RST_FLAG_LOSE_NET);
+//                            YS_PrmReadOneItem(FLH_PRM_FLI_ENABLE,FLH_PRM_FLI_ENABLE_LEN,fbuf);
+//                            if(fbuf[0]==1)
+//                            {
+//                                YS_EntryGsmSleepMode();
+//                            }
+//                            else
+//                            {
+//                                YS_RunEntrySleepMode();	//进入休眠模式
+//                            }
                         }
                         break;
                 }
@@ -2191,7 +2206,11 @@ void YS_RunAppWorkFlowManage(void)
             YS_RunTraceInit();
 //            YS_AGpsDealInterFace();
             t_SysRunStatus.RunFlow=YS_RUN_FLOW_IDLE_DEAL;
-            YS_WebAddRequest();
+            if (t_SysRunStatus.CsqValue >21)
+            {
+                YS_WebAddRequest();
+            }
+
             break;
 
         case YS_RUN_FLOW_IDLE_DEAL: 	//系统IDLE模式处理

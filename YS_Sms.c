@@ -1402,6 +1402,23 @@ bool YS_SmsParaseRstCmd(u8 *dbuf, u16 dlen)
 }
 
 /*-----------------------------------------------------------------------------------------
+函数名：YS_SmsParaseUpdateCmd
+功能说明：解析升级指令
+修改记录：
+-------------------------------------------------------------------------------------------*/
+bool YS_SmsParaseUpdateCmd(u8 *dbuf, u16 dlen)
+{
+    if((dlen==6)&&(dbuf[0]=='U')&&(dbuf[1]=='P')&&(dbuf[2]=='D')&&(dbuf[3]=='A')&&(dbuf[4]=='T')&&(dbuf[5]=='E')) //远程升级
+    {
+        YS_WebAddRequest();
+        return(TRUE);
+    }
+    else
+    {
+        return(FALSE);
+    }
+}
+/*-----------------------------------------------------------------------------------------
 函数名：YS_SmsCompHeadDeal
 功能说明：比较操作密码
 修改记录：
@@ -1696,6 +1713,12 @@ bool YS_SmsComInfoParase(u8 *dbuf, u16 dlen, u8 *PhoneData, u8 PhoneLen)
     else if(YS_SmsSetID(dbuf,dlen,PhoneData,PhoneLen)==TRUE) //配置终端ID号(SIM卡号)
     {
         YS_UartDebugInterfacel(INTER_PTL_UPDATE_SMSREC,(u8 *)"id ok",5);
+//        YS_SysRsqSystemRST(YS_RST_FLAG_USER);
+        return(TRUE);
+    }
+    else if(YS_SmsParaseUpdateCmd(dbuf,dlen)==TRUE)  //重启
+    {
+//        YS_SmsAckSmsDeal(SMS_ACK_FLAG_CQ,PhoneData,PhoneLen);
 //        YS_SysRsqSystemRST(YS_RST_FLAG_USER);
         return(TRUE);
     }
