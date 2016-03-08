@@ -522,11 +522,11 @@ void YS_PrmSetFactroyWorkParam(void)
     fbuf[0]=0; //远程升级标志
     YS_PrmWriteOneItem(FLH_PRM_NV_DWFLAG,FLH_PRM_NV_DWFLAG_LEN,fbuf);
 
-    fbuf[0]=0x23; //远程升级端口9160
-    fbuf[1]=0xC8;
+    fbuf[0]=0x00; //远程升级端口80
+    fbuf[1]=0x50;
     YS_PrmWriteOneItem(FLH_PRM_NV_DWPORT,FLH_PRM_NV_DWPORT_LEN,fbuf);
 
-    sprintf(StrDat,"117.27.136.205");			//远程升级服务器IP
+    sprintf(StrDat,"120.24.255.230");			//远程升级服务器IP 120.24.255.230:80
     len=strlen(StrDat);
     for(i=0; i<len; i++)
     {
@@ -537,22 +537,6 @@ void YS_PrmSetFactroyWorkParam(void)
 
     fbuf[0]=1; //自动升级使能
     YS_PrmWriteOneItem(FLH_PRM_NV_AUTOPLAT_ENABLE,FLH_PRM_NV_AUTOPLAT_ENABLE_LEN,fbuf);
-
-    fbuf[0]=0x23; //远程升级端口9162
-    fbuf[1]=0xCA;
-    YS_PrmWriteOneItem(FLH_PRM_NV_AUTOPLAT_PORT,FLH_PRM_NV_AUTOPLAT_PORT_LEN,fbuf);
-
-    sprintf(StrDat,"117.27.136.205");			//自动升级服务器IP
-    len=strlen(StrDat);
-    for(i=0; i<len; i++)
-    {
-        fbuf[i]=StrDat[i];
-    }
-    fbuf[len]=0;
-    YS_PrmWriteOneItem(FLH_PRM_NV_AUTOPLAT_ADDR,FLH_PRM_NV_AUTOPLAT_ADDR_LEN,fbuf);
-
-    fbuf[0]=0; //自动升级连接标志
-    YS_PrmWriteOneItem(FLH_PRM_NV_AUTOPLAT_FLAG,FLH_PRM_NV_AUTOPLAT_FLAG_LEN,fbuf);
 
     fbuf[0]=0x00;
     YS_PrmWriteOneItem(FLH_PRM_FLI_ENABLE, FLH_PRM_FLI_ENABLE_LEN,fbuf);
@@ -1789,59 +1773,6 @@ bool YS_WorkPrmReadDeal(u8 *dbuf, u16 dlen, u8 *PackBuf, u16 *PackLen)
             pos++;
         }
     }
-    else if(YS_PrmCompTwoString(HBYD_pARAM_READ_AUTO_PORT,(char *)dbuf)) //自动升级服务器端口读取
-    {
-        len=strlen(HBYD_pARAM_NAME_AUTO_PORT);
-        for(i=0; i<len; i++)
-        {
-            PackBuf[pos]=HBYD_pARAM_NAME_AUTO_PORT[i];
-            pos++;
-        }
-        YS_PrmReadOneItem(FLH_PRM_NV_AUTOPLAT_PORT,FLH_PRM_NV_AUTOPLAT_PORT_LEN,fbuf);
-        dat=fbuf[0]*256+fbuf[1];
-        sprintf(StrDat,"%d",dat);
-        len=strlen(StrDat);
-        for(i=0; i<len; i++)
-        {
-            PackBuf[pos]=StrDat[i];
-            pos++;
-        }
-    }
-    else if(YS_PrmCompTwoString(HBYD_pARAM_READ_AUTODLPORT,(char *)dbuf)) //自动升级服务器端口读取
-    {
-        len=strlen(HBYD_pARAM_NAME_AUTODLPORT);
-        for(i=0; i<len; i++)
-        {
-            PackBuf[pos]=HBYD_pARAM_NAME_AUTODLPORT[i];
-            pos++;
-        }
-        YS_PrmReadOneItem(FLH_PRM_NV_AUTOPLAT_PORT,FLH_PRM_NV_AUTOPLAT_PORT_LEN,fbuf);
-        dat=fbuf[0]*256+fbuf[1];
-        sprintf(StrDat,"%d",dat);
-        len=strlen(StrDat);
-        for(i=0; i<len; i++)
-        {
-            PackBuf[pos]=StrDat[i];
-            pos++;
-        }
-    }
-    else if(YS_PrmCompTwoString(HBYD_pARAM_READ_AUTO_FLAG,(char *)dbuf)) //自动升级连接标志
-    {
-        len=strlen(HBYD_pARAM_NAME_AUTO_FLAG);
-        for(i=0; i<len; i++)
-        {
-            PackBuf[pos]=HBYD_pARAM_NAME_AUTO_FLAG[i];
-            pos++;
-        }
-        YS_PrmReadOneItem(FLH_PRM_NV_AUTOPLAT_FLAG,FLH_PRM_NV_AUTOPLAT_FLAG_LEN,fbuf);
-        sprintf(StrDat,"%d",fbuf[0]);
-        len=strlen(StrDat);
-        for(i=0; i<len; i++)
-        {
-            PackBuf[pos]=StrDat[i];
-            pos++;
-        }
-    }
     else if(YS_PrmCompTwoString(HBYD_PARAM_READ_UPDATE_MODE,(char *)dbuf)) //读取工作模式
     {
         len=strlen(HBYD_PARAM_NAME_UPDATE_MODE);
@@ -2949,36 +2880,6 @@ bool YS_WorkPrmSetDeal(u8 *dbuf, u16 dlen)
 
             if(len<FLH_PRM_NV_AUTOPLAT_ADDR_LEN) fbuf[len]=0;
             YS_PrmWriteOneItem(FLH_PRM_NV_AUTOPLAT_ADDR,FLH_PRM_NV_AUTOPLAT_ADDR_LEN,fbuf);
-            YS_PrmQuickWriteNV();
-            return(TRUE);
-        }
-    }
-    else if(YS_PrmFindStringInbuf(dbuf,dlen,HBYD_pARAM_NAME_AUTODLPORT,StrDat))//设置服务器端口
-    {
-        if(YS_PrmPDNumString(StrDat,FALSE,1,0,0xFFFF)==FALSE)
-        {
-            return(FALSE);
-        }
-        else
-        {
-            Value=atoi(StrDat);
-            fbuf[0]=Value/256;
-            fbuf[1]=Value%256;
-            YS_PrmWriteOneItem(FLH_PRM_NV_AUTOPLAT_PORT,FLH_PRM_NV_AUTOPLAT_PORT_LEN,fbuf);
-            YS_PrmQuickWriteNV();
-            return(TRUE);
-        }
-    }
-    else if(YS_PrmFindStringInbuf(dbuf,dlen,HBYD_pARAM_NAME_AUTO_FLAG,StrDat)) //设置自动升级连接标志
-    {
-        if(YS_PrmPDNumString(StrDat,TRUE,1,0,1)==FALSE)
-        {
-            return(FALSE);
-        }
-        else
-        {
-            fbuf[0]=atoi(StrDat);
-            YS_PrmWriteOneItem(FLH_PRM_NV_AUTOPLAT_FLAG,FLH_PRM_NV_AUTOPLAT_FLAG_LEN,fbuf);
             YS_PrmQuickWriteNV();
             return(TRUE);
         }

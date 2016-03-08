@@ -41,9 +41,9 @@
 
 #define	IP_CHANGE_EN     		1
 
-#define 	EBIKE_SOFT_VER  			"A20_V1.0"
+#define 	EBIKE_SOFT_VER  			"A20_V1.0t"
 
-#define   PROJECT_NAME_DEF			"OBD"
+#define   PROJECT_NAME_DEF			"MOTOR"
 
 #define   PROJECT_APP_VER_DEF		"V1.01"
 

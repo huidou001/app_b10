@@ -1418,6 +1418,7 @@ void YS_ExitGsmSleepMode(void)
 -------------------------------------------------------------------------------------------*/
 bool YS_RunWebSocketInterFace(void)
 {
+#if 0
     u8 IPBuf[5];
     u16 Port;
 
@@ -1429,6 +1430,27 @@ bool YS_RunWebSocketInterFace(void)
     IPBuf[4]=0x00;
 
     Port=80;
+
+#else
+    u8 fbuf[40],IPBuf[4];
+	u16 i,len,count,Port,rlt;
+	char StrDat[10];
+
+	YS_PrmReadOneItem(FLH_PRM_NV_DWADDR,FLH_PRM_NV_DWADDR_LEN,fbuf);
+	len=YS_CodeBufRealLen(fbuf,FLH_PRM_NV_DWADDR_LEN);
+	count=0;
+
+	for(i=0; i<4; i++)
+	{
+	    count=YS_CodeGetItemInBuf(fbuf,len,(u8 *)StrDat,i,'.',4);
+	    StrDat[count]=0;
+	    IPBuf[i]=atoi(StrDat);
+	}
+
+	YS_PrmReadOneItem(FLH_PRM_NV_DWPORT,FLH_PRM_NV_DWPORT_LEN,fbuf);
+	Port=fbuf[0]*256+fbuf[1];
+    #endif
+
     sjfun_Socket_Create(t_FlowInfo.AcctID, &t_FlowInfo.WebSckID,IPBuf, Port,0);
     return TRUE;
 }
