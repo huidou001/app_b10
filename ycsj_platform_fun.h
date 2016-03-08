@@ -33,7 +33,7 @@ extern U32 sjfun_PPP_Interface(char *apn, char *ApnUser, char *ApnPassWord);
 
 extern bool sjfun_Socket_Create(U32 AcctID, U8 *SocketID, U8 *IPBuf, U16 Port, U8 SocketType);
 
-extern U32 sjfun_Socket_Send(U8 SocketID, U8 *dbuf, U16 dlen);
+extern int sjfun_Socket_Send(U8 SocketID, U8 *dbuf, U16 dlen);
 
 extern void sjfun_Socket_Close(U8 SocketID);
 
@@ -144,4 +144,10 @@ extern void sjfun_Aux_Com_send(U8 *dbuf, U16 dlen);
 extern u8 sjfun_SkyLine_Mode(void);
 
 extern void sjfun_Debug_Agps_Write(U8 *dbuf, U16 dlen);
+
+extern void sjfun_VmcSignControl(u8 id);
+
+extern u8 sjfun_VmcGetOCStatus(void);
+
+extern void sjfun_ucs2totext_str(u8 *dst, u32 size, u8 *src, u8 num);
 #endif

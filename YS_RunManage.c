@@ -28,7 +28,6 @@ t_Net_Info 			t_NetInfo;
 -------------------------------------------------------------------------------------------*/
 void YS_FactoryMode(void)
 {
-//#if UART_DBG_EN == 0
     char DispBuf[200];
     char fbuf[100],StrDat[20];
     u16 i,len,pos,dat16;
@@ -181,7 +180,15 @@ void YS_FactoryMode(void)
         DispBuf[pos]=',';
         pos++;
 
-        DispBuf[pos]= t_FlowInfo.LogOKFlag+0x30;                                      //GSM信号
+        if (t_SysRunStatus.RunFlow == YS_RUN_FLOW_IDLE_DEAL)
+        {
+            DispBuf[pos]= 0x31;                                      //GSM信号
+        }
+        else
+        {
+            DispBuf[pos]= 0x30;                                      //GSM信号
+        }
+
         pos++;
         DispBuf[pos]=',';
         pos++;
@@ -208,12 +215,25 @@ void YS_FactoryMode(void)
     pos++;
     DispBuf[pos]='\0';
     pos++;
-//    sprintf(DispBuf,"\n%s:%d",DebugStr,Value);
-//    U_PutUARTBytes(0,(kal_uint8 *)DispBuf,strlen(DispBuf));
-    ycsj_debug((char *)(DispBuf));
+    if (t_FlowInfo.DebugLog == TRUE)
+    {
+        ycsj_debug((char *)(DispBuf));
+    }
+
 //#endif
 }
 
+void SetDebugLog(void)
+{
+    if (t_FlowInfo.DebugLog == FALSE)
+    {
+        t_FlowInfo.DebugLog = TRUE;
+    }
+    else
+    {
+        t_FlowInfo.DebugLog = FALSE;
+    }
+}
 /*-----------------------------------------------------------------------------------------
 函数名：YS_RunCleanWarmFlag
 功能说明：清除报警标志
@@ -962,6 +982,7 @@ void YS_RunInitSysInfo(void)
     {
         t_SysRunStatus.WarnStatus[i]=0;
     }
+    t_FlowInfo.DebugLog = TRUE;
 }
 
 /*-----------------------------------------------------------------------------------------
@@ -1057,6 +1078,11 @@ void YS_RunSocketSendData(u8 *dbuf, u16 dlen)
     ycsj_debug((char *)DbgBuf);
 
     SendRlt=sjfun_Socket_Send(t_FlowInfo.SocketID, dbuf, dlen);
+    if (SendRlt < 0)
+    {
+        ycsj_debug("gprs send fail %d", SendRlt);
+        t_SysRunStatus.RunFlow=YS_RUN_FLOW_RDCON_BEGIN;
+    }
 }
 
 void YS_RunSetSeverReg(void)
@@ -1139,7 +1165,7 @@ void YS_RunIdlePosCtrl(void)
         PosDelaySet=PosDelaySet*6;
     }
     t_FlowInfo.PosDelay++;
-    if(t_FlowInfo.PosDelay >= 30)
+    if(t_FlowInfo.PosDelay >= 5)
     {
         t_FlowInfo.PosDelay=0;
         YS_GprsServerSendInterface(SERV_UP_CMD_POS, NULL,0);
@@ -1174,7 +1200,6 @@ void YS_RunIdleCANCtrl(void)
 //            YS_GprsServerSendInterface(SERV_UP_CMD_FAULT, NULL,0);
 //        }
     }
-
 }
 
 /*-----------------------------------------------------------------------------------------
@@ -1350,6 +1375,7 @@ void YS_RunEntryWakeupMode(void)
         {
             YS_AGpsDealInterFace();
         }
+        sjfun_timer(GIS_TIMER_ID_4,200,YS_IODealLedTimerHandler);
     }
     t_SysRunStatus.SleepStatus=0;
     t_FlowInfo.SleepCount=0;
@@ -1589,8 +1615,6 @@ void YS_RunLoginServerInit(void)
     t_FlowInfo.LogTimes=0;
     t_FlowInfo.LogDelay=RUN_LOGIN_DELAY_DEF;
 }
-
-
 
 /*-----------------------------------------------------------------------------------------
 函数名：YS_RunLoginServerAck
@@ -1858,8 +1882,8 @@ void YS_RunUpdateRequest(void)
     {
         t_FlowInfo.BankAccStatus = FALSE;
     }
-
 }
+
 /*-----------------------------------------------------------------------------------------
 函数名：YS_RunAppWorkFlowManage
 功能说明：系统工作时序管理
@@ -1874,6 +1898,7 @@ void YS_RunAppWorkFlowManage(void)
     u8 DnsRlt;
 
     YS_IOInputInfoDeal();
+    YS_OBDRstDeal();
     YS_WebServiceRsqFlow();
     YS_RunAutoRstCtrl(); 			//定时复位管理
 //    YS_AGpsGetRunFlow();
@@ -1901,7 +1926,6 @@ void YS_RunAppWorkFlowManage(void)
                 t_SysRunStatus.RunFlow=YS_RUN_FLOW_RST_EXITWAIT;
 //                t_SysRunStatus.RunFlow=YS_RUN_FLOW_WAIT_PPP;
             }
-
 #else
             if(t_SysRunStatus.RegStatus==1)
             {
@@ -2005,15 +2029,16 @@ void YS_RunAppWorkFlowManage(void)
                         }
                         else
                         {
-                            YS_PrmReadOneItem(FLH_PRM_FLI_ENABLE,FLH_PRM_FLI_ENABLE_LEN,fbuf);
-                            if(fbuf[0]==1)
-                            {
-                                YS_EntryGsmSleepMode();
-                            }
-                            else
-                            {
-                                YS_RunEntrySleepMode();	//进入休眠模式
-                            }
+                            YS_SysRsqSystemRST(YS_RST_FLAG_LOSE_NET);
+//                            YS_PrmReadOneItem(FLH_PRM_FLI_ENABLE,FLH_PRM_FLI_ENABLE_LEN,fbuf);
+//                            if(fbuf[0]==1)
+//                            {
+//                                YS_EntryGsmSleepMode();
+//                            }
+//                            else
+//                            {
+//                                YS_RunEntrySleepMode();	//进入休眠模式
+//                            }
                         }
                         break;
                 }
@@ -2076,8 +2101,8 @@ void YS_RunAppWorkFlowManage(void)
             {
                 t_FlowInfo.SocOk = 1;
                 t_FlowInfo.SocketErrTimes=0;
-                t_SysRunStatus.RunFlow=YS_RUN_FLOW_SEVLOG_BEGIN;
-//                t_SysRunStatus.RunFlow=YS_RUN_FLOW_REGSERVER_BEGIN;
+//                t_SysRunStatus.RunFlow=YS_RUN_FLOW_SEVLOG_BEGIN;
+                t_SysRunStatus.RunFlow=YS_RUN_FLOW_REGSERVER_BEGIN;
             }
             else
             {
@@ -2181,7 +2206,11 @@ void YS_RunAppWorkFlowManage(void)
             YS_RunTraceInit();
 //            YS_AGpsDealInterFace();
             t_SysRunStatus.RunFlow=YS_RUN_FLOW_IDLE_DEAL;
-            YS_WebAddRequest();
+            if (t_SysRunStatus.CsqValue >21)
+            {
+                YS_WebAddRequest();
+            }
+
             break;
 
         case YS_RUN_FLOW_IDLE_DEAL: 	//系统IDLE模式处理
@@ -2191,7 +2220,7 @@ void YS_RunAppWorkFlowManage(void)
 //            YS_RunTraceCtrl();			//上报TRACE 数据
             YS_RunIdlePosCtrl();	//定时数据上报控制
             YS_RunIdleCANCtrl();
-            if(t_FlowInfo.HeartTimes>RUN_HEART_TIMES_DEF)
+            if(t_FlowInfo.HeartTimes>=RUN_HEART_TIMES_DEF)
             {
                 sjfun_Socket_Close(t_FlowInfo.SocketID);
                 t_SysRunStatus.RunFlow=YS_RUN_FLOW_RDCON_BEGIN;
@@ -2420,7 +2449,7 @@ void YS_RunYSAppEntry(void)
     YS_IOVibJudgeInit();
 //    YS_DWAppInitDeal();
     YS_SmsManageInit();
-    YS_GSensorInitDeal();
+//    YS_GSensorInitDeal();
     YS_AuxUartBufInit();
     SysInfoInitOk=TRUE;
 }

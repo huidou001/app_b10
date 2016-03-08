@@ -26,4 +26,5 @@ extern bool YS_GprsDealJTBServRecData(u8 *buf, u16 len);
 
 extern bool YS_GprsJBTSckPtlUpConver(void);
 
+extern u16 YS_GprsPackObdInfoAckPackage(u8 *PackBuf, u8 *dbuf, u16 dlen);
 #endif

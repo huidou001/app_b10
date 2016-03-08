@@ -15,7 +15,6 @@ void YS_IODealLedTimerHandler(void)
 {
     static u8 GsmLedCount=0;
     static u8 GpsLedCount=0;
-    static u8 TestCount=0;
 
     t_Sys_Run_Status t_GetStatus;
     t_Gps_Data_Info	t_GetGps;
@@ -23,33 +22,26 @@ void YS_IODealLedTimerHandler(void)
     YS_GpsGetPosData(&t_GetGps);
     YS_RunGetSystemStatus(&t_GetStatus);
 
-    if (TestCount%2 == 0)
-    {
-        TestCount++;
-        sjfun_Gpio_Write_Value(YS_PIN_NO_TEST_PIN,1);
-    }
-    else
-    {
-        TestCount++;
-        sjfun_Gpio_Write_Value(YS_PIN_NO_TEST_PIN,0);
-    }
-
     if(t_GetGps.Effective==TRUE)	//GPS 指示灯控制
     {
         t_GpioCtrlManage.GpsLedStatus=1;				//GPS 定位时，指示灯常亮
         sjfun_SetKPLED(1);
     }
-    if(sjfun_Get_Power_Statue()==TRUE)
+    if(t_GetStatus.RunFlow == YS_RUN_FLOW_IDLE_DEAL)
     {
         GsmLedCount++;
-        if(GsmLedCount==5)
+        if(GsmLedCount==1)
         {
-            sjfun_SetKPLED(0);
+            sjfun_SetKPLED(1);
         }
-        else if(GsmLedCount>=10)
+        else if(GsmLedCount==3)
         {
             GsmLedCount=0;
-            sjfun_SetKPLED(1);
+            sjfun_SetKPLED(0);
+        }
+        else if  (GsmLedCount>=5)
+        {
+            GsmLedCount = 0;
         }
     }
     else
@@ -87,13 +79,13 @@ void YS_IODealLedTimerHandler(void)
 -------------------------------------------------------------------------------------------*/
 void YS_IODealInit(void)
 {
-    sjfun_Gpio_Set_Mode(YS_PIN_NO_LED_GPS, 0);
-    sjfun_Gpio_Set_Direction(YS_PIN_NO_LED_GPS,0);
-    sjfun_Gpio_Write_Value(YS_PIN_NO_LED_GPS,0);
+//    sjfun_Gpio_Set_Mode(YS_PIN_NO_LED_GPS, 0);
+//    sjfun_Gpio_Set_Direction(YS_PIN_NO_LED_GPS,0);
+//    sjfun_Gpio_Write_Value(YS_PIN_NO_LED_GPS,0);
 
-    sjfun_Gpio_Set_Mode(YS_PIN_NO_LED_GSM, 0);
-    sjfun_Gpio_Set_Direction(YS_PIN_NO_LED_GSM,0);
-    sjfun_Gpio_Write_Value(YS_PIN_NO_LED_GSM,0);
+//    sjfun_Gpio_Set_Mode(YS_PIN_NO_LED_GSM, 0);
+//    sjfun_Gpio_Set_Direction(YS_PIN_NO_LED_GSM,0);
+//    sjfun_Gpio_Write_Value(YS_PIN_NO_LED_GSM,0);
 
     sjfun_Gpio_Set_Mode(YS_PIN_NO_GPS_PWR, 0);
     sjfun_Gpio_Set_Direction(YS_PIN_NO_GPS_PWR,0);
@@ -105,9 +97,10 @@ void YS_IODealInit(void)
     sjfun_Gpio_Set_Direction(YS_PIN_NO_ACC_PWR,1);
     sjfun_Gpio_Write_Value(YS_PIN_NO_ACC_PWR,1);
 
-    sjfun_Gpio_Set_Mode(YS_PIN_NO_TEST_PIN, 0);
-    sjfun_Gpio_Set_Direction(YS_PIN_NO_TEST_PIN,0);
-    sjfun_Gpio_Write_Value(YS_PIN_NO_TEST_PIN,1);
+
+    sjfun_Gpio_Set_Mode(YS_PIN_NO_OBD_RST, 0);
+    sjfun_Gpio_Set_Direction(YS_PIN_NO_OBD_RST,0);
+    sjfun_Gpio_Write_Value(YS_PIN_NO_OBD_RST,1);
 
     t_GpioCtrlManage.GpsLedStatus=0;
     t_GpioCtrlManage.GsmLedStatus=0;
@@ -311,7 +304,7 @@ void YS_IOInputInfoDeal(void)
     }
 
 //    YS_RunAccStatusBrush(1);
-#if 1
+#if 0
     if (sjfun_Gpio_Read_Value(YS_PIN_NO_ACC_PWR) == 0)//ACC 接口状态
     {
         YS_RunAccStatusBrush(1);

@@ -49,7 +49,7 @@ t_Sms_Com_Moni			t_SmsComMoni;
 
 #define SMS_CMD_HEAD_IPPORT		"#654321#IP#"
 #define SMS_CMD_HEAD_ID 	    "#654321#ID#"
-
+#define SMS_CMD_HEAD_PLATE      "#PTE#"
 enum
 {
     SMS_ACK_FLAG_ERRCMD,
@@ -107,6 +107,7 @@ enum
     SMS_ACK_FLAG_SETKEY1,
     SMS_ACK_FLAG_SETKEY2,
     SMS_ACK_APN_SET,
+    SMS_ACK_FLAG_PLATE,
     SMS_ACK_FLAG_DW
 };
 
@@ -201,7 +202,7 @@ u8	Sms_Con_Serv_Addr[]= {0x49, 0x50, 0xBA, 0xCD, 0xB6, 0xCB, 0xBF, 0xDA, 0xC9, 0
                           0xB3, 0xC9, 0xB9, 0xA6, 0x21
                         }; //IP和端口设置成功!
 
-u8 Sms_Con_Sim_Own[]={0x49, 0x44, 0xC9, 0xE8, 0xD6, 0xC3, 0xB3, 0xC9, 0xB9, 0xA6, 0x21};//ID设置成功!
+u8 Sms_Con_Sim_Own[]= {0x49, 0x44, 0xC9, 0xE8, 0xD6, 0xC3, 0xB3, 0xC9, 0xB9, 0xA6, 0x21}; //ID设置成功!
 
 //您的终端【
 u8 SmsCon_Warn_Batt_Low[]= {0xC4, 0xFA, 0xB5, 0xC4, 0xD6, 0xD5, 0xB6, 0xCB, 0xA1, 0xBE};
@@ -211,11 +212,8 @@ u8 SmsCon_Warn_Batt_Low1[]= {0xA1, 0xBF, 0xB5, 0xE7, 0xC1, 0xBF, 0xB2, 0xBB, 0xD
                              0xEB, 0xBC, 0xB0, 0xCA, 0xB1, 0xB3, 0xE4, 0xB5, 0xE7, 0x21, 0xCA, 0xA3, 0xD3, 0xE0, 0xB5, 0xE7, 0xC1, 0xBF, 0x3A
                             };
 
-
-//您的宠物终端已被拆除，请注意!
-u8 SmsCon_Dismatle[]= {0xC4, 0xFA, 0xB5, 0xC4, 0xB3, 0xE8, 0xCE, 0xEF, 0xD6, 0xD5, 0xB6, 0xCB, 0xD2, 0xD1, 0xB1,
-                       0xBB, 0xB2, 0xF0, 0xB3, 0xFD, 0xA3, 0xAC, 0xC7, 0xEB, 0xD7, 0xA2, 0xD2, 0xE2, 0x21
-                      };
+ //车牌号设置成功,
+u8 SmsCon_Plate[]= {0xB3, 0xB5, 0xC5, 0xC6, 0xBA, 0xC5, 0xC9, 0xE8, 0xD6, 0xC3, 0xB3, 0xC9, 0xB9, 0xA6, 0x2C};
 /*-----------------------------------------------------------------------------------------
 函数名：YS_SmsMulSendAddOneRec
 功能说明：添加一条缓冲信息
@@ -630,6 +628,19 @@ void YS_SmsAckSmsDeal(u8 RltID, u8 *PhoneCode, u8 PhoneLen)
             }
             t_SmsMulManage.RstFlag = TRUE;
             break;
+
+        case SMS_ACK_FLAG_PLATE:
+            PackLen=sizeof(SmsCon_Plate);
+            memcpy(PackBuf,SmsCon_Plate,PackLen);
+            YS_PrmReadOneItem(FLH_JTB_PLATE_STRING,FLH_JTB_PLATE_STRING_LEN,fbuf);
+            len=YS_CodeBufRealLen(fbuf, FLH_JTB_PLATE_STRING_LEN);
+            for ( i = 0; i<len; i++ )
+            {
+                PackBuf[PackLen]=fbuf[i];
+                PackLen++;
+            }
+            break;
+
         default:
             break;
     }
@@ -1391,6 +1402,23 @@ bool YS_SmsParaseRstCmd(u8 *dbuf, u16 dlen)
 }
 
 /*-----------------------------------------------------------------------------------------
+函数名：YS_SmsParaseUpdateCmd
+功能说明：解析升级指令
+修改记录：
+-------------------------------------------------------------------------------------------*/
+bool YS_SmsParaseUpdateCmd(u8 *dbuf, u16 dlen)
+{
+    if((dlen==6)&&(dbuf[0]=='U')&&(dbuf[1]=='P')&&(dbuf[2]=='D')&&(dbuf[3]=='A')&&(dbuf[4]=='T')&&(dbuf[5]=='E')) //远程升级
+    {
+        YS_WebAddRequest();
+        return(TRUE);
+    }
+    else
+    {
+        return(FALSE);
+    }
+}
+/*-----------------------------------------------------------------------------------------
 函数名：YS_SmsCompHeadDeal
 功能说明：比较操作密码
 修改记录：
@@ -1688,11 +1716,33 @@ bool YS_SmsComInfoParase(u8 *dbuf, u16 dlen, u8 *PhoneData, u8 PhoneLen)
 //        YS_SysRsqSystemRST(YS_RST_FLAG_USER);
         return(TRUE);
     }
+    else if(YS_SmsParaseUpdateCmd(dbuf,dlen)==TRUE)  //重启
+    {
+//        YS_SmsAckSmsDeal(SMS_ACK_FLAG_CQ,PhoneData,PhoneLen);
+//        YS_SysRsqSystemRST(YS_RST_FLAG_USER);
+        return(TRUE);
+    }
     else if(YS_SmsParaseRstCmd(dbuf,dlen)==TRUE)  //重启
     {
         YS_SmsAckSmsDeal(SMS_ACK_FLAG_CQ,PhoneData,PhoneLen);
         YS_SysRsqSystemRST(YS_RST_FLAG_USER);
         return(TRUE);
+    }
+    else if(YS_SmsCompHeadDeal(SMS_CMD_HEAD_PLATE,dbuf,dlen)==TRUE)//设置车牌号
+    {
+        u8 buf[30]={0};
+        u8 DbgBuf[30];
+//        sjfun_ucs2totext_str(buf,30,dbuf,2);
+//        dlen=strlen((char *)buf);
+        GetLen=YS_CodeGetItemInBuf(dbuf,dlen,StrDat,2,'#',FLH_JTB_PLATE_STRING_LEN);
+        StrDat[GetLen]=0;
+//        sjfun_ucs2totext_str(buf,GetLen*2+2,StrDat,2);
+        YS_CodeHextoString(dbuf,GetLen*2+2,DbgBuf);
+        ycsj_debug((char *)DbgBuf);
+//        StrDat[0] = buf[0];
+//        StrDat[1] = buf[1];
+        YS_PrmWriteOneItem(FLH_JTB_PLATE_STRING,FLH_JTB_PLATE_STRING_LEN,StrDat);
+        YS_SmsAckSmsDeal(SMS_ACK_FLAG_PLATE,PhoneData,PhoneLen);
     }
     else if(YS_SmsWeiHuSmsDeal(dbuf,dlen,PhoneData,PhoneLen)==TRUE) //维护
     {
@@ -1771,10 +1821,10 @@ void  YS_SmsComeInterface(char* sFromNumber,char* sContent)
     YS_UartDebugInterfacel(INTER_PTL_UPDATE_SMSREC,(u8*)sFromNumber,strlen(sFromNumber));
     YS_UartDebugInterfacel(INTER_PTL_UPDATE_SMSREC,(u8*)sContent,strlen(sContent));
 
-	if(strcmp(sFromNumber,"10086")==0)
-	{
-		return;
-	}
+    if(strcmp(sFromNumber,"10086")==0)
+    {
+        return;
+    }
     YS_SmsComInfoParase((u8 *)sContent, strlen(sContent), (u8*)sFromNumber, sFromNumberLen);
 }
 

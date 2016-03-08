@@ -8,7 +8,7 @@
 
 #define YS_PIN_NO_I2CSCL		43	//gSensor 读写时钟PIN 定义
 #define YS_PIN_NO_I2CDAT		44	//gSensor读写数据PIN 定义
-#define YS_PIN_NO_GPOW			9	//gSensor电源控制PIN否定义
+#define YS_PIN_NO_GPOW			0	//gSensor电源控制PIN否定义
 #define YS_PIN_NO_GINT			6	//gSensor中断信号输入
 
 #define YS_PIN_NO_LED_GPS		33
@@ -17,12 +17,11 @@
 #define YS_PIN_NO_GPS_PWR       55
 
 #define YS_PIN_NO_ACC_PWR       8
-#define YS_PIN_NO_TEST_PIN      9  //测试脚
 
 #define YS_PIN_NO_LED_CHARGE	53	//充电指示灯控制
 
 //#define YS_PIN_NO_VCC_SIGN		8	//充电输入检测
-#define YS_PIN_NO_CHAR_SIGN	    26	//充电状态检测
+#define YS_PIN_NO_OBD_RST       9	//充电状态检测
 
 //红外引脚定义
 //#define YS_PIN_IRSENSOR_I2CSCL		1
@@ -123,5 +122,7 @@ extern  void YS_SetPowoffKeyMsg(void);
 extern void YS_SetShutDownLedFlag(void);
 
 extern void YS_IOACCDydReCount(void);
+
+extern void YS_IODealLedTimerHandler(void);
 #endif
 

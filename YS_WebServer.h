@@ -5,13 +5,13 @@
 
 #define Web_Cmd_Buf_NUM	5
 #define Web_SCK_WAIT_DELAY	30
-#define Web_RSQ_SEND_DELAY	180
+#define Web_RSQ_SEND_DELAY	120
 #define Web_RSQ_SEND_TIMES	1
 #define Web_Exit_Wait_Delay		5
 
 #if 1   //dog care
-#define WEBSTR_RSQ    "POST http://qq.dogcare.com.cn/zhf//OBD/B10.bin HTTP/1.1"
-#define WEBSTR_UPDATE "POST http://qq.dogcare.com.cn/zhf/OBD/jt_ads.bin HTTP/1.1"
+#define WEBSTR_RSQ    "POST http://qq.dogcare.com.cn/zhf/A20/A20.bin HTTP/1.1"
+#define WEBSTR_UPDATE "POST http://qq.dogcare.com.cn/zhf/A20/jt_ads.bin HTTP/1.1"
 
 #define WEBSTR_1 "Host:http://www.dogcare.com.cn"
 #define WEBSTR_2 "User-Agent:SQH_D480B_01/LB19504/WAP2.0Profile"
