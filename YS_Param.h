@@ -110,17 +110,16 @@
 #define FLH_PRM_PLATFORM_VER				196		//存贮主模块，判断是否需要重新加载默认的应用程序
 #define FLH_PRM_PLATFORM_VER_LEN			20
 
-#define FLH_PRM_DW_PHONE					216		//短信升级结果回复
-#define FLH_PRM_DW_PHONE_LEN				12
+//#define FLH_PRM_DW_PHONE					216		//短信升级结果回复
+//#define FLH_PRM_DW_PHONE_LEN				12
 
-#define FLH_PRM_NV_AUTOPLAT_ENABLE		228		//自动升级判定平台使能
+#define FLH_PRM_NV_AUTOPLAT_ENABLE		216	//自动升级判定平台使能
 #define FLH_PRM_NV_AUTOPLAT_ENABLE_LEN	1
 
-#define FLH_PRM_NV_AUTOPLAT_ADDR			229		//自动升级判定平台地址
-#define FLH_PRM_NV_AUTOPLAT_ADDR_LEN	20
+#define FLH_PRM_NV_AUTOPLAT_ADDR			217     //HTTP升级文件路径
+#define FLH_PRM_NV_AUTOPLAT_ADDR_LEN	30
 
-#define FLH_PRM_NV_AUTOPLAT_PORT			249		//自动升级判定平台端口
-#define FLH_PRM_NV_AUTOPLAT_PORT_LEN		2
+/*****************************************/
 
 #define FLH_PRM_NV_AUTOPLAT_FLAG			251		//自动升级判定平台连接标志
 #define FLH_PRM_NV_AUTOPLAT_FLAG_LEN		1

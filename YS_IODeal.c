@@ -304,7 +304,7 @@ void YS_IOInputInfoDeal(void)
     }
 
 //    YS_RunAccStatusBrush(1);
-#if 0
+#if 1
     if (sjfun_Gpio_Read_Value(YS_PIN_NO_ACC_PWR) == 0)//ACC ½Ó¿Ú×´Ì¬
     {
         YS_RunAccStatusBrush(1);

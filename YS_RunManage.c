@@ -1779,25 +1779,6 @@ void YS_RunWarnSignInput(u8 WarnID)
     t_FlowInfo.WarnDelay=RUN_WARN_DELAY_DEF;
 }
 
-void YS_RunDwUpdataSmsCrtl(void)
-{
-    u8 fbuf[20];
-    u8 fbufLen;
-
-    YS_PrmReadOneItem(FLH_PRM_DW_PHONE,FLH_PRM_DW_PHONE_LEN,fbuf);
-    fbufLen = YS_CodeBufRealLen(fbuf,FLH_PRM_DW_PHONE_LEN);
-
-    if((fbufLen!=0)&&(t_SysRunStatus.RegStatus==1))
-    {
-        YS_PrmReadOneItem(FLH_PRM_NV_DWFLAG,FLH_PRM_NV_DWFLAG_LEN,fbuf);
-        if(fbuf[0]==0)//&&(FirstRun==1))
-        {
-//            YS_DWUpdateResultDeal(DW_RLT_UPDATE_SUCCESS);
-        }
-    }
-    return;
-}
-
 
 /*-----------------------------------------------------------------------------------------
 º¯ÊýÃû£ºYS_RunRegServerCtrl
@@ -1926,7 +1907,6 @@ void YS_RunAppWorkFlowManage(void)
 //    YS_AGpsGetRunFlow();
     YS_SmsSendComMoniCtrl();
     YS_SysGetBarCodeCtrl();
-    YS_RunDwUpdataSmsCrtl();
     YS_RunSleepCtrl();  				//ÐÝÃß»½ÐÑ¿ØÖÆ
     YS_FactoryMode();
 

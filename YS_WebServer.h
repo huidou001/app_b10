@@ -9,7 +9,21 @@
 #define Web_RSQ_SEND_TIMES	1
 #define Web_Exit_Wait_Delay		5
 
-#if 1   //dog care
+//qq.dogcare.com.cn/zhf
+#define WEBSTR_HEAD    "POST http://"
+
+#define WEBSTR_RSQTAIL    "/A20.bin HTTP/1.1"
+
+#define WEBSTR_UPDATETAIL "/jt_ads.bin HTTP/1.1"
+
+#define WEBSTR_1 "Host:http://www.dogcare.com.cn"
+#define WEBSTR_2 "User-Agent:SQH_D480B_01/LB19504/WAP2.0Profile"
+#define WEBSTR_3 "Accept:image/gif, image/jpeg, imagepeg, imagepeg, application/x-shockwave-flash, applicationnd.ms-excel, applicationnd.ms-powerpoint, application/msword, */*"
+#define WEBSTR_4 "Accept-Charset:utf-8,utf-16,iso-8859-1,iso-10646-ucs-2,GB2312,windows-1252,us-ascii"
+#define WEBSTR_5 "Accept-Language:zh-tw,zh-cn,en"
+#define WEBSTR_6 "Connection:Keep-Alive"
+
+#if 0   //dog care
 #define WEBSTR_RSQ    "POST http://qq.dogcare.com.cn/zhf/A20/A20.bin HTTP/1.1"
 #define WEBSTR_UPDATE "POST http://qq.dogcare.com.cn/zhf/A20/jt_ads.bin HTTP/1.1"
 

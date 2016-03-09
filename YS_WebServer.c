@@ -183,14 +183,32 @@ void YS_LongToPosStr(u8 *Pos, char *BackStr)
 u16	YS_WebServicePackageRsq(u8 *PackBuf)
 {
     u16 pos,i,len;
+    u8 fbuf[40];
 
     pos=0;
-    len=strlen(WEBSTR_RSQ);  //第一行数据
+
+    len=strlen(WEBSTR_HEAD);  //第一行数据
     for(i=0; i<len; i++)
     {
-        PackBuf[pos]=WEBSTR_RSQ[i];
+        PackBuf[pos]=WEBSTR_HEAD[i];
         pos++;
     }
+
+    YS_PrmReadOneItem(FLH_PRM_NV_AUTOPLAT_ADDR, FLH_PRM_NV_AUTOPLAT_ADDR_LEN, fbuf);//第一行数据
+    len = YS_CodeBufRealLen(fbuf, FLH_PRM_NV_AUTOPLAT_ADDR_LEN);
+    for (i=0; i<len; i++)
+    {
+        PackBuf[pos]=fbuf[i];
+        pos++;
+    }
+
+    len=strlen(WEBSTR_RSQTAIL);  //第一行数据
+    for(i=0; i<len; i++)
+    {
+        PackBuf[pos]=WEBSTR_RSQTAIL[i];
+        pos++;
+    }
+
     PackBuf[pos]=0x0D;
     pos++;
     PackBuf[pos]=0x0A;
@@ -279,12 +297,29 @@ u16	YS_WebServicePackageRsq(u8 *PackBuf)
 u16	YS_WebServicePackageUpdate(u8 *PackBuf)
 {
     u16 pos,i,len;
+    u8 fbuf[40];
 
     pos=0;
-    len=strlen(WEBSTR_UPDATE);  //第一行数据
+
+    len=strlen(WEBSTR_HEAD);  //第一行数据
     for(i=0; i<len; i++)
     {
-        PackBuf[pos]=WEBSTR_UPDATE[i];
+        PackBuf[pos]=WEBSTR_HEAD[i];
+        pos++;
+    }
+
+    YS_PrmReadOneItem(FLH_PRM_NV_AUTOPLAT_ADDR, FLH_PRM_NV_AUTOPLAT_ADDR_LEN, fbuf);//第一行数据
+    len = YS_CodeBufRealLen(fbuf, FLH_PRM_NV_AUTOPLAT_ADDR_LEN);
+    for (i=0; i<len; i++)
+    {
+        PackBuf[pos]=fbuf[i];
+        pos++;
+    }
+
+    len=strlen(WEBSTR_UPDATETAIL);  //第一行数据
+    for(i=0; i<len; i++)
+    {
+        PackBuf[pos]=WEBSTR_UPDATETAIL[i];
         pos++;
     }
     PackBuf[pos]=0x0D;

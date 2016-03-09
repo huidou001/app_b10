@@ -125,7 +125,7 @@ void YS_PamFormatRunParam(void)
     fbuf[1]=0xB4;
     YS_PrmWriteOneItem(FLH_PRM_ACC_TIME,FLH_PRM_ACC_TIME_LEN,fbuf); //ACCLT*/
 
-    fbuf[0]=0;
+    fbuf[0]=1;
     YS_PrmWriteOneItem(FLH_PRM_SLEEP_CTRL,FLH_PRM_SLEEP_CTRL_LEN,fbuf); //SLEEP ENABLE
     fbuf[0]=0x00;
     fbuf[1]=0x3c;
@@ -353,9 +353,9 @@ void YS_PrmSetFactroyWorkParam(void)
     fbuf[1]=0xF4;
     YS_PrmWriteOneItem(FLH_PRM_MOVE_WARN,FLH_PRM_MOVE_WARN_LEN,fbuf);
     fbuf[0]=0;
-    YS_PrmWriteOneItem(FLH_PRM_OUT_SMS,FLH_PRM_OUT_SMS_LEN,fbuf);		//OUT
+    YS_PrmWriteOneItem(FLH_PRM_OUT_SMS, FLH_PRM_OUT_SMS_LEN,fbuf);		//OUT
     fbuf[0]=1;
-    YS_PrmWriteOneItem(FLH_PRM_OUT_GPRS,FLH_PRM_OUT_GPRS_LEN,fbuf);	//OUTS*/
+    YS_PrmWriteOneItem(FLH_PRM_OUT_GPRS, FLH_PRM_OUT_GPRS_LEN,fbuf);	//OUTS*/
 
     fbuf[0]=1;								//位置上报使能
     YS_PrmWriteOneItem(FLH_PRM_TRACE_ENABLE,FLH_PRM_TRACE_ENABLE_LEN,fbuf);
@@ -396,7 +396,7 @@ void YS_PrmSetFactroyWorkParam(void)
     fbuf[1]=0xB4;
     YS_PrmWriteOneItem(FLH_PRM_ACC_TIME,FLH_PRM_ACC_TIME_LEN,fbuf); //ACCLT*/
 
-    fbuf[0]=0;
+    fbuf[0]=1;
     YS_PrmWriteOneItem(FLH_PRM_SLEEP_CTRL,FLH_PRM_SLEEP_CTRL_LEN,fbuf); //SLEEP ENABLE
     fbuf[0]=0x00;
     fbuf[1]=0x3c;
@@ -448,7 +448,7 @@ void YS_PrmSetFactroyWorkParam(void)
     YS_PrmWriteOneItem(FLH_PRM_ANGLE_SEND_FLAG,FLH_PRM_ANGLE_SEND_FLAG_LEN,fbuf);
 
     //fbuf[0]=10; //报警次数限制
-    //YS_PrmWriteOneItem(FLH_PRM_WARN_TIMES_MAX,FLH_PRM_WARN_TIMES_MAX_LEN,fbuf);
+    //YS_PrmWriteOneItem(FLH_PRM_WARN_TIMES_MAX, FLH_PRM_WARN_TIMES_MAX_LEN, fbuf);
 
     fbuf[0]=0;
     YS_PrmWriteOneItem(FLH_PRM_NV_GPS_PYYH,FLH_PRM_NV_GPS_PYYH_LEN,fbuf);	//开GPS优化
@@ -534,6 +534,15 @@ void YS_PrmSetFactroyWorkParam(void)
     }
     fbuf[len]=0;
     YS_PrmWriteOneItem(FLH_PRM_NV_DWADDR,FLH_PRM_NV_DWADDR_LEN,fbuf);
+
+    sprintf(StrDat,"qq.dogcare.com.cn/zhf/A20");			//HTTP升级文件路径
+    len=strlen(StrDat);
+    for(i=0; i<len; i++)
+    {
+        fbuf[i]=StrDat[i];
+    }
+    fbuf[len]=0;
+    YS_PrmWriteOneItem(FLH_PRM_NV_AUTOPLAT_ADDR, FLH_PRM_NV_AUTOPLAT_ADDR_LEN,fbuf);
 
     fbuf[0]=1; //自动升级使能
     YS_PrmWriteOneItem(FLH_PRM_NV_AUTOPLAT_ENABLE,FLH_PRM_NV_AUTOPLAT_ENABLE_LEN,fbuf);
@@ -1757,22 +1766,6 @@ bool YS_WorkPrmReadDeal(u8 *dbuf, u16 dlen, u8 *PackBuf, u16 *PackLen)
             pos++;
         }
     }
-    else if(YS_PrmCompTwoString(HBYD_pARAM_READ_AUTO_ADDR,(char *)dbuf)) //读取服务器IP
-    {
-        len=strlen(HBYD_pARAM_NAME_AUTO_ADDR);
-        for(i=0; i<len; i++)
-        {
-            PackBuf[pos]=HBYD_pARAM_NAME_AUTO_ADDR[i];
-            pos++;
-        }
-        YS_PrmReadOneItem(FLH_PRM_NV_AUTOPLAT_ADDR,FLH_PRM_NV_AUTOPLAT_ADDR_LEN,fbuf);
-        len=YS_CodeBufRealLen(fbuf,FLH_PRM_NV_AUTOPLAT_ADDR_LEN);
-        for(i=0; i<len; i++)
-        {
-            PackBuf[pos]=fbuf[i];
-            pos++;
-        }
-    }
     else if(YS_PrmCompTwoString(HBYD_PARAM_READ_UPDATE_MODE,(char *)dbuf)) //读取工作模式
     {
         len=strlen(HBYD_PARAM_NAME_UPDATE_MODE);
@@ -2860,26 +2853,6 @@ bool YS_WorkPrmSetDeal(u8 *dbuf, u16 dlen)
         {
             fbuf[0]=atoi(StrDat);
             YS_PrmWriteOneItem(FLH_PRM_NV_AUTOPLAT_ENABLE,FLH_PRM_NV_AUTOPLAT_ENABLE_LEN,fbuf);
-            YS_PrmQuickWriteNV();
-            return(TRUE);
-        }
-    }
-    else if(YS_PrmFindStringInbuf(dbuf,dlen,HBYD_pARAM_NAME_AUTO_ADDR,StrDat))//设置自动升级IP
-    {
-        len=strlen(StrDat);
-        if((len==0)||(len>FLH_PRM_NV_AUTOPLAT_ADDR_LEN))
-        {
-            return(FALSE);
-        }
-        else
-        {
-            for(i=0; i<len; i++)
-            {
-                fbuf[i]=StrDat[i];
-            }
-
-            if(len<FLH_PRM_NV_AUTOPLAT_ADDR_LEN) fbuf[len]=0;
-            YS_PrmWriteOneItem(FLH_PRM_NV_AUTOPLAT_ADDR,FLH_PRM_NV_AUTOPLAT_ADDR_LEN,fbuf);
             YS_PrmQuickWriteNV();
             return(TRUE);
         }

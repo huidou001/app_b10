@@ -16,7 +16,7 @@
 
 #define YS_PIN_NO_GPS_PWR       55
 
-#define YS_PIN_NO_ACC_PWR       8
+#define YS_PIN_NO_ACC_PWR       6
 
 #define YS_PIN_NO_LED_CHARGE	53	//充电指示灯控制
 
