@@ -1533,16 +1533,16 @@ bool YS_UartInputCmdControl(u8 *dbuf, u8 dlen)
         else if ('0'==StrDat[0])
         {
             //关闭GPS 电源
-            sjfun_VmcSignControl(0);
-//            sjfun_Gpio_Write_Value(YS_PIN_NO_GPS_PWR,0);
+//            sjfun_VmcSignControl(0);
+            sjfun_Gpio_Write_Value(YS_PIN_NO_GPS_PWR,0);
             YS_RunSetGpsPower(0);
             YS_UartCmdAckDeal(UART_ACK_GPS_OK);
         }
         else
         {
             //打开GPS 电源
-            sjfun_VmcSignControl(1);
-//            sjfun_Gpio_Write_Value(YS_PIN_NO_GPS_PWR,1);
+//            sjfun_VmcSignControl(1);
+            sjfun_Gpio_Write_Value(YS_PIN_NO_GPS_PWR,1);
             YS_RunSetGpsPower(1);
 
             YS_UartCmdAckDeal(UART_ACK_GPS_OK);

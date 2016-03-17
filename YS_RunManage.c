@@ -1352,6 +1352,8 @@ void YS_RunEntrySleepMode(void)
 
     sjfun_Sys_Sleep_Enable();						//允许MTK 进入休眠模式
     t_SysRunStatus.SleepStatus=1; 				//设置休眠状态
+
+    sjfun_Gpio_Write_Value(YS_PIN_NO_GPS_PWR,0);//关闭GPS电源
     sjfun_Gps_Stop(TRUE);  						//GPS 处理模块关闭
     t_FlowInfo.GpsPowerFlag=FALSE;
     t_FlowInfo.OptDelay=0;
@@ -1370,6 +1372,7 @@ void YS_RunEntryWakeupMode(void)
     if(t_SysRunStatus.SleepStatus==1) //如果系统已进入休眠状态
     {
         t_FlowInfo.GpsPowerFlag=TRUE;
+        sjfun_Gpio_Write_Value(YS_PIN_NO_GPS_PWR,1);//打开GPS电源
         sjfun_Gps_Start(TRUE);  //GPS 处理模块开启
         if(t_SysRunStatus.RunFlow==YS_RUN_FLOW_IDLE_DEAL)  //如果系统已处于正常连接状态，启动AGPS功能
         {
@@ -1433,23 +1436,23 @@ bool YS_RunWebSocketInterFace(void)
 
 #else
     u8 fbuf[40],IPBuf[4];
-	u16 i,len,count,Port,rlt;
-	char StrDat[10];
+    u16 i,len,count,Port,rlt;
+    char StrDat[10];
 
-	YS_PrmReadOneItem(FLH_PRM_NV_DWADDR,FLH_PRM_NV_DWADDR_LEN,fbuf);
-	len=YS_CodeBufRealLen(fbuf,FLH_PRM_NV_DWADDR_LEN);
-	count=0;
+    YS_PrmReadOneItem(FLH_PRM_NV_DWADDR,FLH_PRM_NV_DWADDR_LEN,fbuf);
+    len=YS_CodeBufRealLen(fbuf,FLH_PRM_NV_DWADDR_LEN);
+    count=0;
 
-	for(i=0; i<4; i++)
-	{
-	    count=YS_CodeGetItemInBuf(fbuf,len,(u8 *)StrDat,i,'.',4);
-	    StrDat[count]=0;
-	    IPBuf[i]=atoi(StrDat);
-	}
+    for(i=0; i<4; i++)
+    {
+        count=YS_CodeGetItemInBuf(fbuf,len,(u8 *)StrDat,i,'.',4);
+        StrDat[count]=0;
+        IPBuf[i]=atoi(StrDat);
+    }
 
-	YS_PrmReadOneItem(FLH_PRM_NV_DWPORT,FLH_PRM_NV_DWPORT_LEN,fbuf);
-	Port=fbuf[0]*256+fbuf[1];
-    #endif
+    YS_PrmReadOneItem(FLH_PRM_NV_DWPORT,FLH_PRM_NV_DWPORT_LEN,fbuf);
+    Port=fbuf[0]*256+fbuf[1];
+#endif
 
     sjfun_Socket_Create(t_FlowInfo.AcctID, &t_FlowInfo.WebSckID,IPBuf, Port,0);
     return TRUE;
@@ -1534,16 +1537,29 @@ void YS_RunSleepCtrl(void)
 
     if(t_SysRunStatus.SleepStatus==0)  //如果已经进入休眠状态
     {
-        YS_PrmReadOneItem(FLH_PRM_SLEEP_TIME,FLH_PRM_SLEEP_TIME_LEN,fbuf); //自动休眠时间
-        SleepSetTime=fbuf[0]+fbuf[1];
-
-        t_FlowInfo.VibSleepCount++;
-        if(t_FlowInfo.VibSleepCount>=SleepSetTime)
+        if (t_SysRunStatus.AccStatus == 0)
         {
-            t_FlowInfo.VibSleepCount = 0;
-            YS_RunEntrySleepMode();
+            YS_PrmReadOneItem(FLH_PRM_SLEEP_TIME,FLH_PRM_SLEEP_TIME_LEN,fbuf); //自动休眠时间
+            SleepSetTime=fbuf[0]+fbuf[1];
+
+            t_FlowInfo.VibSleepCount++;
+            if(t_FlowInfo.VibSleepCount>=SleepSetTime)
+            {
+                t_FlowInfo.VibSleepCount = 0;
+                YS_RunEntrySleepMode();
+            }
         }
     }
+    else
+    {
+        if (t_SysRunStatus.AccStatus == 1)
+        {
+            YS_RunEntryWakeupMode();
+            t_FlowInfo.VibSleepCount =0;
+        }
+    }
+
+
 }
 
 /*-----------------------------------------------------------------------------------------
@@ -2192,7 +2208,7 @@ void YS_RunAppWorkFlowManage(void)
             {
                 t_SysRunStatus.RunFlow=YS_RUN_FLOW_REGSERVER_BEGIN;
                 fbuf[0]=FJYD_TERI_STATUS_INIT;
-                YS_PrmWriteOneItem(FLH_PRM_ACTIVE_FLAG,FLH_PRM_ACTIVE_FLAG_LEN,fbuf);
+                YS_PrmWriteOneItem(FLH_PRM_ACTIVE_FLAG, FLH_PRM_ACTIVE_FLAG_LEN, fbuf);
                 YS_GprsDebugString("YS_RUN_FLOW_SEVLOG  FAIL",0);
                 t_SysRunStatus.RunFlow=YS_RUN_FLOW_RDCON_BEGIN;
             }
@@ -2227,6 +2243,10 @@ void YS_RunAppWorkFlowManage(void)
                 sjfun_Socket_Close(t_FlowInfo.SocketID);
                 t_SysRunStatus.RunFlow=YS_RUN_FLOW_RDCON_BEGIN;
             }
+            if (t_SysRunStatus.SleepStatus==1)
+            {
+                t_SysRunStatus.RunFlow=YS_RUN_FLOW_SLEEP_BEGIN;
+            }
             break;
 
         case YS_RUN_FLOW_RDCON_BEGIN: //开始重连处理
@@ -2252,6 +2272,7 @@ void YS_RunAppWorkFlowManage(void)
                 }
             }
             break;
+
         case YS_RUN_FLOW_SLEEP_BEGIN: //开始进入修眠模式
             t_FlowInfo.SleepDelayWait++;
             if(t_FlowInfo.SleepDelayWait>=3)
@@ -2377,7 +2398,6 @@ void YS_RunDnsEventHandler(u8 status, u8 *IPBuf)
     }
 }
 
-
 /*-----------------------------------------------------------------------------------------
 函数名：YS_RunUbloxHostNamehandler
 功能说明：异步等待DSN解析结果的回调函数Ublox专用
@@ -2470,7 +2490,7 @@ void YS_GprsDebugString(char *DebugStr, kal_int32 Value)
     YS_PrmReadOneItem(FLH_PRM_DEBUG_ENABLE,FLH_PRM_DEBUG_ENABLE_LEN,fbuf);
 //    if(fbuf[0]==1)
     {
-        sprintf((char*)DispBuf,"\n%s:%d\r\n",(u8*)DebugStr,Value);
+        sprintf((char*)DispBuf,"\n%s:%d\r\n", (u8*)DebugStr, Value);
         ycsj_debug((char*)DispBuf);
     }
 }

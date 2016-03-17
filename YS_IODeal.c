@@ -22,6 +22,12 @@ void YS_IODealLedTimerHandler(void)
     YS_GpsGetPosData(&t_GetGps);
     YS_RunGetSystemStatus(&t_GetStatus);
 
+    if (t_GetStatus.SleepStatus == 1)
+    {
+        sjfun_SetKPLED(0);
+        sjfun_stoptimer(GIS_TIMER_ID_4);
+        return;
+    }
     if(t_GetGps.Effective==TRUE)	//GPS 指示灯控制
     {
         t_GpioCtrlManage.GpsLedStatus=1;				//GPS 定位时，指示灯常亮
@@ -313,12 +319,12 @@ void YS_IOInputInfoDeal(void)
             BankACCstatus = TRUE;
 //            YS_WebAddRequest(FALSE);
         }
-        if (YS_RunGetGpsPower()==FALSE)
-        {
+//        if (YS_RunGetGpsPower()==FALSE)
+//        {
 //            YS_RunSetGpsPower(TRUE);
 //            sjfun_Gpio_Write_Value(YS_PIN_NO_GPS_PWR,1);//打开GPS电源
 //            sjfun_Gps_Start(0);
-        }
+//        }
     }
     else
     {
@@ -327,12 +333,12 @@ void YS_IOInputInfoDeal(void)
         {
             BankACCstatus = FALSE;
         }
-        if (YS_RunGetGpsPower()==TRUE)
-        {
+//        if (YS_RunGetGpsPower()==TRUE)
+//        {
 //            YS_RunSetGpsPower(FALSE);
 //            sjfun_Gpio_Write_Value(YS_PIN_NO_GPS_PWR,0);//关闭GPS电源
 //            sjfun_Gps_Stop(0);
-        }
+//        }
     }
 #endif
 }

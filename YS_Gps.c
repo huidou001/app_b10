@@ -1514,7 +1514,7 @@ void YS_GpsSysInitDeal(void)
     t_BDStarParase.TestOK=FALSE;
 
     YS_GpsBufInit();
-    sjfun_VmcSignControl(1);
+//    sjfun_VmcSignControl(1);
     sjfun_Gps_Start(TRUE);
 }
 
